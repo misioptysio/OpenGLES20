@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -13,8 +14,8 @@ import android.view.WindowManager;
 public class GLES20Activity extends Activity
 {
 
-	private GLSurfaceView mSurfaceView;
 	private GLSurfaceView mGLView;
+	private GLES20Renderer mRenderer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -26,10 +27,17 @@ public class GLES20Activity extends Activity
 
 		if (hasGLES20())
 		{
+			Utils.log("GLES20Activity.onCreate");
 			mGLView = new GLSurfaceView(this);
 			mGLView.setEGLContextClientVersion(2);
-			mGLView.setPreserveEGLContextOnPause(true);
-			mGLView.setRenderer(new GLES20Renderer());
+//			mGLView.setPreserveEGLContextOnPause(true);
+
+			Utils.log("Before renderer creation");
+			mRenderer = new GLES20Renderer();
+//			mGLView.setRenderer(new GLES20Renderer());
+			mGLView.setRenderer(mRenderer);
+			Utils.log("After renderer creation");
+//			mGLView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 		}
 		else
 		{
@@ -51,28 +59,22 @@ public class GLES20Activity extends Activity
 	protected void onResume()
 	{
 		super.onResume();
-				/*
-				 * The activity must call the GL surface view's
-         * onResume() on activity onResume().
-         */
-		if (mSurfaceView != null)
+		if (mGLView != null)
 		{
-			mSurfaceView.onResume();
+//			mGLView.onResume();
 		}
+		Utils.log("onResume RED in activity");
+		GLES20.glClearColor(0.5f, 0.0f, 0.0f, 1.0f);
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 	}
 
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-
-        /*
-         * The activity must call the GL surface view's
-         * onPause() on activity onPause().
-         */
-		if (mSurfaceView != null)
+		if (mGLView != null)
 		{
-			mSurfaceView.onPause();
+//			mGLView.onPause();
 		}
 	}
 
@@ -82,101 +84,3 @@ public class GLES20Activity extends Activity
 		return super.dispatchTouchEvent(ev);
 	}
 }
-
-/*
-public class MyActivity extends AppCompatActivity
-{
-	public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
-	private GLSurfaceView mSurfaceView;
-	private GLSurfaceView mGLView;
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_my);
-
-		EditText editText = (EditText) findViewById(R.id.edit_message);
-		editText.getText().clear();
-		if (hasGLES20())
-		{
-			editText.getText().append("Has OpenGL ES 2.0 :)");
-		}
-		else
-		{
-			editText.getText().append("No OpenGL ES 2.0 :(");
-		}
-		initialize();
-	}
-
-	private void initialize()
-	{
-		if (hasGLES20())
-		{
-			mGLView = new GLSurfaceView(this);
-			mGLView.setEGLContextClientVersion(2);
-			mGLView.setPreserveEGLContextOnPause(true);
-			mGLView.setRenderer(new GLES20Renderer());
-		}
-		else
-		{
-			// Time to get a new phone, OpenGL ES 2.0 not supported.
-		}
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		mGLView.onResume();
-	}
-
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		mGLView.onPause();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_my, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-
-		//noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings)
-		{
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	private boolean hasGLES20()
-	{
-		ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		ConfigurationInfo info = am.getDeviceConfigurationInfo();
-		return info.reqGlEsVersion >= 0x20000;
-	}
-
-	public void sendMessage(View view)
-	{
-		Intent intent = new Intent(this, DisplayMessageActivity.class);
-		EditText editText = (EditText) findViewById(R.id.edit_message);
-		String msgText = editText.getText().toString();
-		intent.putExtra(EXTRA_MESSAGE, msgText);
-		startActivity(intent);
-	}
-}
-*/

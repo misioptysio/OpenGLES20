@@ -10,8 +10,15 @@ public class Utils
 	public static final boolean DEBUG = true;
 	public static final String LOG_TAG = "[PTYSIO]";
 
-	public void log(String format, Object... args)
+	public static void log(String format, Object... args)
 	{
-		Log.d(LOG_TAG, format, args);
+		if (DEBUG)
+			Log.d(LOG_TAG, String.format(format, args));
+	}
+
+	public static void log(String msg)
+	{
+		if (DEBUG)
+			Log.d(LOG_TAG, msg);
 	}
 }
