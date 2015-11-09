@@ -1,7 +1,10 @@
-/build
-
-local.properties
-
 /app/build
 
 .gradle
+/local.properties
+.DS_Store
+/build
+.idea/libraries
+.idea/tasks.xml
+.idea/vcs.xml
+.idea/workspace.xml
