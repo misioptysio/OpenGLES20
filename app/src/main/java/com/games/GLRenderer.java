@@ -1,7 +1,6 @@
 package com.games;
 
 import android.opengl.GLSurfaceView.Renderer;
-import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,7 +27,6 @@ public abstract class GLRenderer implements Renderer
 	@Override
 	public void onSurfaceCreated(GL10 notUsed, EGLConfig config)
 	{
-		Utils.log("Surface created");
 		mSurfaceCreated = true;
 		mWidth = -1;
 		mHeight = -1;
@@ -39,14 +37,14 @@ public abstract class GLRenderer implements Renderer
 	{
 		if (!mSurfaceCreated && width == mWidth && height == mHeight)
 		{
-			Utils.log("Surface changed but already handled");
+			Utils.log("GLRenderer.onSurfaceChanged() Surface changed but already handled");
 			return;
 		}
 		// Android honeycomb has an option to keep the context.
-		String msg = String.format("Surface changed to %dpx x %dpx", width, height);
+		String msg = String.format("GLRenderer.onSurfaceChanged() Surface changed to %dpx x %dpx", width, height);
 		if (mSurfaceCreated)
 		{
-			msg += " Context lost.";
+			msg += " (context lost)";
 		}
 		Utils.log(msg);
 
@@ -68,6 +66,7 @@ public abstract class GLRenderer implements Renderer
 			long currentTime = System.currentTimeMillis();
 			if (currentTime - mLastTime >= 1000)
 			{
+				Utils.log("FPS " + mFPS);
 				mFPS = 0;
 				mLastTime = currentTime;
 			}
