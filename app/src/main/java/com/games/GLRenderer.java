@@ -28,10 +28,7 @@ public abstract class GLRenderer implements Renderer
 	@Override
 	public void onSurfaceCreated(GL10 notUsed, EGLConfig config)
 	{
-		if (Util.DEBUG)
-		{
-			Log.i(Util.LOG_TAG, "Surface created.");
-		}
+		Utils.log("Surface created");
 		mSurfaceCreated = true;
 		mWidth = -1;
 		mHeight = -1;
@@ -42,27 +39,16 @@ public abstract class GLRenderer implements Renderer
 	{
 		if (!mSurfaceCreated && width == mWidth && height == mHeight)
 		{
-			if (Util.DEBUG)
-			{
-				Log.i(Util.LOG_TAG, "Surface changed but already handled.");
-			}
+			Utils.log("Surface changed but already handled");
 			return;
 		}
-		if (Util.DEBUG)
+		// Android honeycomb has an option to keep the context.
+		String msg = String.format("Surface changed to %dpx x %dpx", width, height);
+		if (mSurfaceCreated)
 		{
-			// Android honeycomb has an option to keep the
-			// context.
-			String msg = "Surface changed width:" + width + " height:" + height;
-			if (mSurfaceCreated)
-			{
-				msg += " context lost.";
-			}
-			else
-			{
-				msg += ".";
-			}
-			Log.i(Util.LOG_TAG, msg);
+			msg += " Context lost.";
 		}
+		Utils.log(msg);
 
 		mWidth = width;
 		mHeight = height;
@@ -76,7 +62,7 @@ public abstract class GLRenderer implements Renderer
 	{
 		onDrawFrame(mFirstDraw);
 
-		if (Util.DEBUG)
+		if (Utils.DEBUG)
 		{
 			mFPS++;
 			long currentTime = System.currentTimeMillis();

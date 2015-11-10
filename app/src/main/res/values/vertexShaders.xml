@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="firstTriangleVertexShader">
+<string name="firstTriangleVertexShader">
     attribute vec4 vPosition;
 
     void main()
