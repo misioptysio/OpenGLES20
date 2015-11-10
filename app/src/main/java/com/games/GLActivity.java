@@ -10,11 +10,11 @@ import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class GLES20Activity extends Activity
+public class GLActivity extends Activity
 {
 
   private GLSurfaceView mGLView;
-  private GLES20Renderer mRenderer;
+  private GLRenderer mRenderer;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -30,7 +30,7 @@ public class GLES20Activity extends Activity
       mGLView.setEGLContextClientVersion(2);
       mGLView.setPreserveEGLContextOnPause(true);
 
-      mRenderer = new GLES20Renderer();
+      mRenderer = new GLRenderer();
       mGLView.setRenderer(mRenderer);
 //      mGLView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
