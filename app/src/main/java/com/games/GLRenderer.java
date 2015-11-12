@@ -44,6 +44,13 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	private long mLastTime;
 	private int mFPS;
 	private GLTriangle mTriangle;
+	private GLShader mShader;
+
+	//pass the reference to global Shader instance
+	public void setShader(GLShader shader)
+	{
+		mShader = shader;
+	}
 
 	public static int loadShader(int type, String shaderCode)
 	{
@@ -72,6 +79,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 //		mTriangle = new GLTriangle(-0.8f, -0.8f, 0f, 0.8f, -0.8f, 0f, -0.8f, 0.8f, 0f);
 		mTriangle = new GLTriangle();
+		mTriangle.setShader(mShader);
 		mTriangle.setPositions(0.0f, 0.622008459f, 0.0f, -0.5f, -0.311004243f, 0.0f, 0.5f, -0.311004243f, 0.0f);
 		mTriangle.setColors(1.0f, 0.0f, 1.0f, 1.0f, 0.8f, 0.0f, 0.0f, 0.99f, 1.0f);
 	}

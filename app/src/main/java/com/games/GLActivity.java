@@ -15,6 +15,7 @@ public class GLActivity extends Activity
 
   private GLSurfaceView mGLView;
   private GLRenderer mRenderer;
+	private GLShader mShader;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -23,6 +24,8 @@ public class GLActivity extends Activity
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		mShader = new GLShader(this);
 
     if (hasGLES20())
     {
@@ -39,6 +42,7 @@ public class GLActivity extends Activity
       Utils.log("No support for OpenGL ES 2.0 :(");
     }
 
+		mRenderer.setShader(mShader);
     setContentView(mGLView);
   }
 

@@ -24,7 +24,7 @@ import static android.opengl.GLES20.glVertexAttribPointer;
 /**
  * Created by piotr.plys on 2015-11-05.
  */
-public class GLTriangle
+public class GLTriangle extends GLObject
 {
 	private static final int BYTES_PER_FLOAT = 4;
 	private static final int VERTICES_COUNT = 3;
@@ -68,8 +68,11 @@ public class GLTriangle
 		init();
 		Utils.log("Triangle byte buffer created ");
 
-		int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, vertexShaderCode);
-		int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
+		//int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, vertexShaderCode);
+		//int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
+
+		int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(mShader.SHADER_MATRIX));
+		int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(mShader.SHADER_MATRIX));
 
 		mProgram = glCreateProgram();
 

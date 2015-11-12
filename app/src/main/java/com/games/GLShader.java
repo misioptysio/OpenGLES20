@@ -6,17 +6,36 @@ import android.content.res.Resources;
 /**
  * Created by piotr.plys on 2015-11-12.
  */
-public class GLShader {
+public class GLShader
+{
+	//
+	public final int TYPE_VS = 0;
+	public final int TYPE_FS = 1;
 
-    private final Resources resources;
+	public final int SHADER_SIMPLE = 0;
+	public final int SHADER_MATRIX = 1;
 
-    public GLShader(Context context) {
-        resources = context.getResources();
+	private String[][] shaderCode = new String[100][2];
+	private final Resources resources;
 
-        resources.getString(R.string.dupaJasiu);
-    }
+	public GLShader(Context context)
+	{
+		resources = context.getResources();
 
-    public String getShader(int id) {
-        return resources.getString(id);
-    }
+		shaderCode[SHADER_SIMPLE][TYPE_VS] = resources.getString(R.string.vsSimple);
+		shaderCode[SHADER_SIMPLE][TYPE_FS] = resources.getString(R.string.fsSimple);
+
+		shaderCode[SHADER_SIMPLE][TYPE_VS] = resources.getString(R.string.vsMatrix);
+		shaderCode[SHADER_SIMPLE][TYPE_FS] = resources.getString(R.string.fsMatrix);
+	}
+
+	public String getVertexShader(int id)
+	{
+		return shaderCode[id][TYPE_VS];
+	}
+
+	public String getFragmentShader(int id)
+	{
+		return shaderCode[id][TYPE_FS];
+	}
 }
