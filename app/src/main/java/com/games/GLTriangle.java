@@ -26,80 +26,17 @@ import static android.opengl.GLES20.glVertexAttribPointer;
  */
 public class GLTriangle extends GLObject
 {
-	private static final int BYTES_PER_FLOAT = 4;
-	private static final int VERTICES_COUNT = 3;
-
-	static final int VALUES_PER_POSITION = 3;
-	static final int VALUES_PER_COLOR = 4;
-	static final int VALUES_PER_NORMAL = 3;
-	static final int POSITION_OFFSET = 0;
-	static final int COLOR_OFFSET = POSITION_OFFSET + VALUES_PER_POSITION;
-	static final int NORMAL_OFFSET = COLOR_OFFSET + VALUES_PER_COLOR;
-
-	private static final int VALUES_PER_VERTEX = VALUES_PER_POSITION + VALUES_PER_COLOR + VALUES_PER_NORMAL;
-	private static final int STRIDE = VALUES_PER_VERTEX * BYTES_PER_FLOAT;
-	private final int mProgram;
-
-	private final String vertexShaderCode = "" +
-		"uniform mat4 uMVPMatrix;" +
-		"attribute vec4 aPosition;" +
-		"attribute vec4 aColor;" +
-		"varying vec4 vColor;" +
-		"void main() {" +
-		"  vColor = aColor;" +
-		"  gl_Position = uMVPMatrix * aPosition;" +
-		"}";
-
-	private final String fragmentShaderCode = "" +
-		"precision mediump float;" +
-		"varying vec4 vColor;" +
-		"void main() {" +
-		"  gl_FragColor = vColor;" +
-		"}";
+	private int mProgram;
 
 	private int uMVPMatrixHandle;
-	private FloatBuffer vertexBuffer;
 	private int aPositionHandle;
 	private int aColorHandle;
 	private int uColorHandle;
 
 	public GLTriangle()
 	{
-		init();
-		Utils.log("Triangle byte buffer created ");
-
-		//int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, vertexShaderCode);
-		//int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
-
-		int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(mShader.SHADER_MATRIX));
-		int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(mShader.SHADER_MATRIX));
-
-		mProgram = glCreateProgram();
-
-		glAttachShader(mProgram, vertexShader);
-		glAttachShader(mProgram, fragmentShader);
-
-		// Bind attributes
-		glBindAttribLocation(mProgram, 0, "aPosition");
-		glBindAttribLocation(mProgram, 1, "aColor");
-
-		glLinkProgram(mProgram);
-		Utils.log("Shaders linked");
-	}
-
-	public void setPosition(int i, float x, float y, float z)
-	{
-		vertexBuffer.put(i * VALUES_PER_VERTEX + POSITION_OFFSET + 0, x);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + POSITION_OFFSET + 1, y);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + POSITION_OFFSET + 2, z);
-	}
-
-	public void setColor(int i, float r, float g, float b, float a)
-	{
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 0, r);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 1, g);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 2, b);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 3, a);
+		vertexCount = 3;
+		createBuffer(vertexCount * VALUES_PER_VERTEX * BYTES_PER_FLOAT);
 	}
 
 	public void setPositions(float x1, float y1, float z1,  float x2, float y2, float z2,  float x3, float y3, float z3)
@@ -123,22 +60,29 @@ public class GLTriangle extends GLObject
 		setColor(2, r3, g3, b3, 1.0f);
 	}
 
-	private void init()
+	public void init()
 	{
-		// initialize vertex byte buffer for shape coordinates
-		ByteBuffer bb = ByteBuffer.allocateDirect(VERTICES_COUNT * VALUES_PER_VERTEX * BYTES_PER_FLOAT);
-		// use the device hardware's native byte order
-		bb.order(ByteOrder.nativeOrder());
+		Utils.log("Triangle byte buffer created ");
 
-		// create a floating point buffer from the ByteBuffer
-		vertexBuffer = bb.asFloatBuffer();
-		// set the buffer to read the first coordinate
-		vertexBuffer.position(0);
+		int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(mShader.SHADER_MATRIX));
+		int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(mShader.SHADER_MATRIX));
+
+		mProgram = glCreateProgram();
+
+		glAttachShader(mProgram, vertexShader);
+		glAttachShader(mProgram, fragmentShader);
+
+		// Bind attributes
+		glBindAttribLocation(mProgram, 0, "aPosition");
+		glBindAttribLocation(mProgram, 1, "aColor");
+
+		glLinkProgram(mProgram);
+		Utils.log("Shaders linked");
 	}
 
 	public void draw(float[] mvpMatrix)
 	{
-		// get handle to vertex shader's vPosition member
+		// get handle to vertex shader's aColor & aPosition members
 		aColorHandle = glGetAttribLocation(mProgram, "aColor");
 		aPositionHandle = glGetAttribLocation(mProgram, "aPosition");
 
@@ -172,7 +116,7 @@ public class GLTriangle extends GLObject
 		glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mvpMatrix, 0);
 
 		// Draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, VERTICES_COUNT);
+		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
 		// Disable vertex array
 		glDisableVertexAttribArray(aPositionHandle);

@@ -2,6 +2,7 @@ package com.games;
 
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -82,6 +83,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mTriangle.setShader(mShader);
 		mTriangle.setPositions(0.0f, 0.622008459f, 0.0f, -0.5f, -0.311004243f, 0.0f, 0.5f, -0.311004243f, 0.0f);
 		mTriangle.setColors(1.0f, 0.0f, 1.0f, 1.0f, 0.8f, 0.0f, 0.0f, 0.99f, 1.0f);
+		mTriangle.init();
 	}
 
 	public void initFrame()
@@ -160,6 +162,9 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void onDrawFrame(boolean firstDraw)
 	{
+		float[] mRotationMatrix = new float[16];
+		float[] scratch = new float[16];
+
 //    Utils.log("Frame drawn @" + getFPS() + "FPS");
 		initFrame();
 
@@ -169,8 +174,15 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		// Calculate the projection and view transformation
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
+		long time = SystemClock.uptimeMillis() % 4000L;
+		float angle = 0.090f * ((int) time);
+		Matrix.setRotateM(mRotationMatrix, 0, angle, 0.0f, 2.3f, -1.0f);
+
+		Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+		mTriangle.draw(scratch);
+//		mTriangle.setColor(0, (float) Math.random(), (float) Math.random(), (float) Math.random(), 1.0f);
 		// Draw shape
-		mTriangle.draw(mMVPMatrix);
+//		mTriangle.draw(mMVPMatrix);
 	}
 
 }
