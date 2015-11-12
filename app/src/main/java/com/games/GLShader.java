@@ -20,6 +20,3 @@ public class GLShader {
         return resources.getString(id);
     }
 }
-
-
-getShader("plastic_red")
