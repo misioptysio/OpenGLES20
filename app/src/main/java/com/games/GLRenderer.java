@@ -1,16 +1,32 @@
 package com.games;
 
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
+import static android.opengl.GLES20.glClear;
+import static android.opengl.GLES20.glClearColor;
+import static android.opengl.GLES20.glCompileShader;
+import static android.opengl.GLES20.glCreateShader;
+import static android.opengl.GLES20.glShaderSource;
+import static android.opengl.GLES20.glViewport;
+
 /*
 tutorials: http://developer.android.com/training/graphics/opengl/draw.html
 http://stackoverflow.com/questions/9371868/android-oncreate-is-not-being-called
 http://developer.android.com/reference/android/opengl/GLSurfaceView.Renderer.html
+
+Matrices:
+*   http://www.songho.ca/opengl/gl_transform.html
+
+Shaders:
+*   http://www.raywenderlich.com/70208/opengl-es-pixel-shaders-tutorial
+*** http://joshbeam.com/articles/getting_started_with_glsl/
+*** http://www.learnopengles.com/android-lesson-one-getting-started/
 */
 
 /**
@@ -31,10 +47,10 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public static int loadShader(int type, String shaderCode)
 	{
-		int shader = GLES20.glCreateShader(type);
+		int shader = glCreateShader(type);
 
-		GLES20.glShaderSource(shader, shaderCode);
-		GLES20.glCompileShader(shader);
+		glShaderSource(shader, shaderCode);
+		glCompileShader(shader);
 
 		return shader;
 	}
@@ -51,19 +67,19 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void initOnce()
 	{
-		GLES20.glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
-
-		GLES20.glViewport(0, 0, mWidth, mHeight);
+		glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
+		glViewport(0, 0, mWidth, mHeight);
 
 //		mTriangle = new GLTriangle(-0.8f, -0.8f, 0f, 0.8f, -0.8f, 0f, -0.8f, 0.8f, 0f);
-		mTriangle = new GLTriangle(0.0f, 0.622008459f, 0.0f, -0.5f, -0.311004243f, 0.0f, 0.5f, -0.311004243f, 0.0f);
-		mTriangle.setColors(1.0f, 0.0f, 0.0f, 1.0f, 0.8f, 0.0f, 0.0f, 0.4f, 1.0f);
+		mTriangle = new GLTriangle();
+		mTriangle.setPositions(0.0f, 0.622008459f, 0.0f, -0.5f, -0.311004243f, 0.0f, 0.5f, -0.311004243f, 0.0f);
+		mTriangle.setColors(1.0f, 0.0f, 1.0f, 1.0f, 0.8f, 0.0f, 0.0f, 0.99f, 1.0f);
 	}
 
 	public void initFrame()
 	{
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-		GLES20.glViewport(0, 0, mWidth, mHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, mWidth, mHeight);
 
 		float ratio = (float) mWidth / mHeight;
 		if (ratio < 1.0)
@@ -147,7 +163,6 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 		// Draw shape
 		mTriangle.draw(mMVPMatrix);
-//    mTriangle.draw();
 	}
 
 }
