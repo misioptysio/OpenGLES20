@@ -22,8 +22,6 @@ import static android.opengl.GLES20.glVertexAttribPointer;
  */
 public class GLTriangle extends GLObject
 {
-	private int mProgram;
-
 	private int uMVPMatrixHandle;
 	private int aPositionHandle;
 	private int aColorHandle;
@@ -56,24 +54,17 @@ public class GLTriangle extends GLObject
 		setColor(2, r3, g3, b3, 1.0f);
 	}
 
+	@Override
 	public void init()
 	{
-		Utils.log("Triangle byte buffer created ");
-
-		int vertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(mShader.SHADER_MATRIX));
-		int fragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(mShader.SHADER_MATRIX));
-
-		mProgram = glCreateProgram();
-
-		glAttachShader(mProgram, vertexShader);
-		glAttachShader(mProgram, fragmentShader);
+		initShaders(mShader.SHADER_MATRIX);
+		initProgram();
 
 		// Bind attributes
-		glBindAttribLocation(mProgram, 0, "aPosition");
-		glBindAttribLocation(mProgram, 1, "aColor");
+		//glBindAttribLocation(mProgram, 0, "aPosition");
+		//glBindAttribLocation(mProgram, 1, "aColor");
 
 		glLinkProgram(mProgram);
-		Utils.log("Shaders linked");
 	}
 
 	public void draw(float[] mvpMatrix)

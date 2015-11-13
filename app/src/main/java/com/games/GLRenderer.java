@@ -1,5 +1,6 @@
 package com.games;
 
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
@@ -28,6 +29,10 @@ Shaders:
 *   http://www.raywenderlich.com/70208/opengl-es-pixel-shaders-tutorial
 *** http://joshbeam.com/articles/getting_started_with_glsl/
 *** http://www.learnopengles.com/android-lesson-one-getting-started/
+
+Textures:
+http://stackoverflow.com/questions/1339136/draw-text-in-opengl-es-android
+
 */
 
 /**
@@ -76,6 +81,17 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	public void initOnce()
 	{
 		glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
+		// Enable depth test
+		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+		// Accept fragment if it closer to the camera than the former one
+		GLES20.glDepthFunc(GLES20.GL_LESS);
+
+		// enable face culling feature
+		GLES20.glEnable(GLES20.GL_CULL_FACE);
+// specify which faces to not draw
+		GLES20.glCullFace(GLES20.GL_BACK);
+
+
 		glViewport(0, 0, mWidth, mHeight);
 
 //		mTriangle = new GLTriangle(-0.8f, -0.8f, 0f, 0.8f, -0.8f, 0f, -0.8f, 0.8f, 0f);
