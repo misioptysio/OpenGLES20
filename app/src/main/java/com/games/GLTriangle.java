@@ -1,9 +1,5 @@
 package com.games;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-
 import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_FRAGMENT_SHADER;
 import static android.opengl.GLES20.GL_TRIANGLES;
@@ -36,7 +32,7 @@ public class GLTriangle extends GLObject
 	public GLTriangle()
 	{
 		vertexCount = 3;
-		createBuffer(vertexCount * VALUES_PER_VERTEX * BYTES_PER_FLOAT);
+		createVertexBuffer(vertexCount);
 	}
 
 	public void setPositions(float x1, float y1, float z1,  float x2, float y2, float z2,  float x3, float y3, float z3)

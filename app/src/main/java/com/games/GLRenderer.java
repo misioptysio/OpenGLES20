@@ -82,7 +82,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mTriangle = new GLTriangle();
 		mTriangle.setShader(mShader);
 		mTriangle.setPositions(0.0f, 0.622008459f, 0.0f, -0.5f, -0.311004243f, 0.0f, 0.5f, -0.311004243f, 0.0f);
-		mTriangle.setColors(1.0f, 0.0f, 1.0f, 1.0f, 0.8f, 0.0f, 0.0f, 0.99f, 1.0f);
+		mTriangle.setColors(1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 1.0f);
 		mTriangle.init();
 	}
 
@@ -174,13 +174,21 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		// Calculate the projection and view transformation
 		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-		long time = SystemClock.uptimeMillis() % 4000L;
-		float angle = 0.090f * ((int) time);
-		Matrix.setRotateM(mRotationMatrix, 0, angle, 0.0f, 2.3f, -1.0f);
+		long time = SystemClock.uptimeMillis();
+		float angle = 0.080f * ((int) time);
+		Matrix.setRotateM(mRotationMatrix, 0, angle, 1.320f, 0.0f, -1.0f);
 
 		Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+
+		float sinValue1 = (float) (Math.sin(angle * 0.017f) + 1) * 0.5f;
+		float sinValue2 = (float) (Math.sin(angle * 0.027f) + 1) * 0.5f;
+		float sinValue3 = (float) (Math.sin(angle * 0.043f) + 1) * 0.5f;
+
+		mTriangle.setColor(0, 1.0f, 0.0f, sinValue1, 1.0f);
+		mTriangle.setColor(1, sinValue2, 1.0f, 0.0f, 1.0f);
+		mTriangle.setColor(2, 0.0f, sinValue3, 1.0f, 1.0f);
+
 		mTriangle.draw(scratch);
-//		mTriangle.setColor(0, (float) Math.random(), (float) Math.random(), (float) Math.random(), 1.0f);
 		// Draw shape
 //		mTriangle.draw(mMVPMatrix);
 	}
