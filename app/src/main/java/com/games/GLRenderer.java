@@ -50,6 +50,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	private long mLastTime;
 	private int mFPS;
 	private GLTriangle mTriangle;
+	private GLCube mCube;
 	private GLShader mShader;
 
 	//pass the reference to global Shader instance
@@ -87,9 +88,8 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		GLES20.glDepthFunc(GLES20.GL_LESS);
 
 		// enable face culling feature
-		GLES20.glEnable(GLES20.GL_CULL_FACE);
-// specify which faces to not draw
-		GLES20.glCullFace(GLES20.GL_BACK);
+		//GLES20.glEnable(GLES20.GL_CULL_FACE);
+		//GLES20.glCullFace(GLES20.GL_BACK);
 
 
 		glViewport(0, 0, mWidth, mHeight);
@@ -97,9 +97,13 @@ public class GLRenderer implements GLSurfaceView.Renderer
 //		mTriangle = new GLTriangle(-0.8f, -0.8f, 0f, 0.8f, -0.8f, 0f, -0.8f, 0.8f, 0f);
 		mTriangle = new GLTriangle();
 		mTriangle.setShader(mShader);
-		mTriangle.setPositions(0.0f, 0.622008459f, 0.0f, -0.5f, -0.311004243f, 0.0f, 0.5f, -0.311004243f, 0.0f);
-		mTriangle.setColors(1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 1.0f);
+		mTriangle.setTrianglePositions(0.0f, 0.577350269f, 0.0f, -0.5f, -0.28867513459f, 0.0f, 0.5f, -0.28867513459f, 0.0f);
+		mTriangle.setTriangleColors(1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 		mTriangle.init();
+
+		mCube = new GLCube();
+		mCube.setShader(mShader);
+		mCube.init();
 	}
 
 	public void initFrame()
@@ -192,7 +196,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 		long time = SystemClock.uptimeMillis();
 		float angle = 0.080f * ((int) time);
-		Matrix.setRotateM(mRotationMatrix, 0, angle, 1.320f, 0.0f, -1.0f);
+		Matrix.setRotateM(mRotationMatrix, 0, angle, 0.0f, 0.0f, -1.0f);
 
 		Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
@@ -204,9 +208,11 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mTriangle.setColor(1, sinValue2, 1.0f, 0.0f, 1.0f);
 		mTriangle.setColor(2, 0.0f, sinValue3, 1.0f, 1.0f);
 
+//		mCube.draw(mMVPMatrix);
 		mTriangle.draw(scratch);
+
 		// Draw shape
-//		mTriangle.draw(mMVPMatrix);
+		//mTriangle.draw(mMVPMatrix);
 	}
 
 }

@@ -10,95 +10,146 @@ import static android.opengl.GLES20.GL_VERTEX_SHADER;
 import static android.opengl.GLES20.glAttachShader;
 import static android.opengl.GLES20.glCreateProgram;
 
+import static com.games.Const.*;
+
 /**
  * Created by piotr.plys on 2015-11-12.
  */
+
+// make a descendant as GLPackedObject, which will use packed vertex arrays
+//This one uses separate buffers for each attribute
 public abstract class GLObject
 {
-	protected static final int BYTES_PER_FLOAT = 4;
-	protected static final short BYTES_PER_SHORT = 2;
+  protected boolean[] buffersUsed = {false, false, false, false};
 
-	protected static final int VALUES_PER_POSITION = 3;
-	protected static final int VALUES_PER_COLOR = 4;
-	protected static final int VALUES_PER_NORMAL = 3;
-	protected static final int VALUES_PER_TEXTURE = 2;
-	protected static final int POSITION_OFFSET = 0;
-	protected static final int COLOR_OFFSET = POSITION_OFFSET + VALUES_PER_POSITION;
-	protected static final int NORMAL_OFFSET = COLOR_OFFSET + VALUES_PER_COLOR;
+  //protected static final int POSITION_OFFSET = 0;
+  //protected static final int COLOR_OFFSET = POSITION_OFFSET + VALUES_PER_POSITION;
+  //protected static final int NORMAL_OFFSET = COLOR_OFFSET + VALUES_PER_V_COLOR;
 
-	protected static final int VALUES_PER_VERTEX = VALUES_PER_POSITION + VALUES_PER_COLOR + VALUES_PER_NORMAL;
-	protected static final int STRIDE = VALUES_PER_VERTEX * BYTES_PER_FLOAT;
+  //protected static final int VALUES_PER_V_POSITION = VALUES_PER_POSITION + VALUES_PER_V_COLOR + VALUES_PER_V_NORMAL;
+  //protected static final int STRIDE = VALUES_PER_V_POSITION * BYTES_PER_FLOAT;
 
-	protected int vertexCount = 3;
+  protected int vertexCount = 3;
 
-	protected GLShader mShader;
-	protected GLMaterial mMaterial;
-	protected FloatBuffer vertexBuffer;
-	protected ShortBuffer drawListBuffer;
+  protected GLShader mShader;
+  protected GLMaterial mMaterial;
+  protected FloatBuffer positionBuffer;
+  protected FloatBuffer colorBuffer;
+  protected FloatBuffer textureBuffer;
+  protected FloatBuffer normalBuffer;
+  protected ShortBuffer drawListBuffer;
 
-	protected int mProgram;
-	protected int mVertexShader;
-	protected int mFragmentShader;
+  protected int mProgram;
+  protected int mVertexShader;
+  protected int mFragmentShader;
 
-	public void setShader(GLShader shader)
-	{
-		mShader = shader;
-	};
+  public void setShader(GLShader shader)
+  {
+    mShader = shader;
+  }
 
-	public void initShaders(int shaderID)
-	{
-		mVertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(shaderID));
-		mFragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(shaderID));
-	}
+  public void initShaders(int shaderID)
+  {
+    mVertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(shaderID));
+    mFragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(shaderID));
+  }
 
-	public void initProgram()
-	{
-		mProgram = glCreateProgram();
+  public void initProgram()
+  {
+    mProgram = glCreateProgram();
 
-		glAttachShader(mProgram, mVertexShader);
-		glAttachShader(mProgram, mFragmentShader);
-	}
+    glAttachShader(mProgram, mVertexShader);
+    glAttachShader(mProgram, mFragmentShader);
+  }
 
-	public void createVertexBuffer(int vertexCount)
-	{
-		// initialize vertex byte buffer for shape coordinates
-		ByteBuffer bb = ByteBuffer.allocateDirect(vertexCount * VALUES_PER_VERTEX * BYTES_PER_FLOAT);
-		// use the device hardware's native byte order
-		bb.order(ByteOrder.nativeOrder());
+  public void createBuffer(int count, byte aType)
+  {
+    int byteCount;
+    FloatBuffer floatBuffer;
 
-		// create a floating point buffer from the ByteBuffer
-		vertexBuffer = bb.asFloatBuffer();
-		// set the buffer to read the first coordinate
-		vertexBuffer.position(0);
-	}
+    buffersUsed[aType] = true;
 
-	public void createDrawListBuffer(int drawListCount)
-	{
-		// initialize vertex byte buffer for shape coordinates
-		ByteBuffer bb = ByteBuffer.allocateDirect(drawListCount * VALUES_PER_VERTEX * BYTES_PER_SHORT);
-		// use the device hardware's native byte order
-		bb.order(ByteOrder.nativeOrder());
+    switch (aType)
+    {
+      case V_POSITION:
+        byteCount = count * VALUES_PER_V_POSITION * BYTES_PER_FLOAT;
+        break;
 
-		// create a floating point buffer from the ByteBuffer
-		vertexBuffer = bb.asFloatBuffer();
-		// set the buffer to read the first coordinate
-		vertexBuffer.position(0);
-	}
+      case V_NORMAL:
+        byteCount = count * VALUES_PER_V_NORMAL * BYTES_PER_FLOAT;
+        break;
 
-	public void setPosition(int i, float x, float y, float z)
-	{
-		vertexBuffer.put(i * VALUES_PER_VERTEX + POSITION_OFFSET + 0, x);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + POSITION_OFFSET + 1, y);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + POSITION_OFFSET + 2, z);
-	}
+      case V_COLOR:
+        byteCount = count * VALUES_PER_V_COLOR * BYTES_PER_FLOAT;
+        break;
 
-	public void setColor(int i, float r, float g, float b, float a)
-	{
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 0, r);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 1, g);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 2, b);
-		vertexBuffer.put(i * VALUES_PER_VERTEX + COLOR_OFFSET + 3, a);
-	}
+      case V_TEXTURE:
+      default:
+        byteCount = count * VALUES_PER_V_TEXTURE * BYTES_PER_FLOAT;
+        break;
+    }
 
-	public abstract void init();
+    ByteBuffer bb = ByteBuffer.allocateDirect(byteCount).order(ByteOrder.nativeOrder());
+    floatBuffer = bb.asFloatBuffer();
+    floatBuffer.position(0);
+
+    switch (aType)
+    {
+      case V_POSITION:
+        positionBuffer = floatBuffer;
+        break;
+
+      case V_NORMAL:
+        normalBuffer = floatBuffer;
+        break;
+
+      case V_COLOR:
+        colorBuffer = floatBuffer;
+        break;
+
+      case V_TEXTURE:
+      default:
+        textureBuffer = floatBuffer;
+        break;
+    }
+  }
+
+  public void createDrawListBuffer(int drawListCount)
+  {
+    ByteBuffer bb = ByteBuffer.allocateDirect(drawListCount * BYTES_PER_SHORT);
+    bb.order(ByteOrder.nativeOrder());
+
+    drawListBuffer = bb.asShortBuffer();
+    drawListBuffer.position(0);
+  }
+
+  public void setPosition(int i, float x, float y, float z)
+  {
+    positionBuffer.put(i * VALUES_PER_V_POSITION + 0, x);
+    positionBuffer.put(i * VALUES_PER_V_POSITION + 1, y);
+    positionBuffer.put(i * VALUES_PER_V_POSITION + 2, z);
+  }
+
+  public void setColor(int i, float r, float g, float b, float a)
+  {
+    colorBuffer.put(i * VALUES_PER_V_COLOR + 0, r);
+    colorBuffer.put(i * VALUES_PER_V_COLOR + 1, g);
+    colorBuffer.put(i * VALUES_PER_V_COLOR + 2, b);
+    colorBuffer.put(i * VALUES_PER_V_COLOR + 3, a);
+  }
+
+  public void setNormal(int i, float x, float y, float z)
+  {
+    normalBuffer.put(i * VALUES_PER_V_NORMAL + 0, x);
+    normalBuffer.put(i * VALUES_PER_V_NORMAL + 1, y);
+    normalBuffer.put(i * VALUES_PER_V_NORMAL + 2, z);
+  }
+
+  public void setTexture(int i, float t, float s)
+  {
+    textureBuffer.put(i * VALUES_PER_V_TEXTURE + 0, t);
+    textureBuffer.put(i * VALUES_PER_V_TEXTURE + 1, s);
+  }
+
+  public abstract void init();
 }
