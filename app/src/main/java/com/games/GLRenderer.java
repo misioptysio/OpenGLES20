@@ -29,6 +29,7 @@ Shaders:
 *   http://www.raywenderlich.com/70208/opengl-es-pixel-shaders-tutorial
 *** http://joshbeam.com/articles/getting_started_with_glsl/
 *** http://www.learnopengles.com/android-lesson-one-getting-started/
+*** http://blog.shayanjaved.com/2011/03/13/shaders-android/
 
 Textures:
 http://stackoverflow.com/questions/1339136/draw-text-in-opengl-es-android
@@ -204,16 +205,13 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		initFrame();
 
 		// Set the camera position (View matrix)
-		Matrix.setLookAtM(mViewMatrix, 0,
-			mGlobals.cameraPosition.get(0), mGlobals.cameraPosition.get(1), mGlobals.cameraPosition.get(2),
-			mGlobals.cameraLookAt.get(0), mGlobals.cameraLookAt.get(1), mGlobals.cameraLookAt.get(2),
-			mGlobals.cameraUp.get(0), mGlobals.cameraUp.get(1), mGlobals.cameraUp.get(2));
+		Matrix.setLookAtM(mViewMatrix, 0, mGlobals.cameraPosition.get(0), mGlobals.cameraPosition.get(1), mGlobals.cameraPosition.get(2), mGlobals.cameraLookAt.get(0), mGlobals.cameraLookAt.get(1), mGlobals.cameraLookAt.get(2), mGlobals.cameraUp.get(0), mGlobals.cameraUp.get(1), mGlobals.cameraUp.get(2));
 
 		// Calculate the projection and view transformation
 		Matrix.multiplyMM(scratch1, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
 		long time = SystemClock.uptimeMillis();
-		float angle = 0.080f * ((int) time);
+		float angle = 0.0150f * ((int) time);
 		Matrix.setRotateM(mRotMatrixX, 0, angle * 1.000000f, 1.0f, 0.0f, 0.0f);
 		Matrix.setRotateM(mRotMatrixY, 0, angle * 0.678957f, 0.0f, 1.0f, 0.0f);
 

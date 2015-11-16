@@ -61,9 +61,12 @@
     varying vec3 vCameraVector;
     varying vec3 vLightVector[LIGHT_COUNT];
 
+    vec4 mNormal;
+
     void main()
     {
-        vNormal = aNormal.xyz;
+        mNormal = uMVPMatrix * aNormal;
+        vNormal = mNormal.xyz;
         vCameraVector = uCameraPosition - aPosition.xyz;
 
         for (int i = 0; i &lt; LIGHT_COUNT; i++)
@@ -96,11 +99,8 @@
         {
             vec3 lightDir = normalize(vLightVector[i]);
             float diffuseDot = dot(normalDir, lightDir);
-    diffuseDot = 1.0;
-    vec4 light = vec4(1.0, 1.0, 0.0, 1.0);
-            diffuse += uLightColor[i] * clamp(diffuseDot, 0.0, 1.0);
 
-    diffuse = vec4(diffuseDot, diffuseDot, diffuseDot, 1.0);
+            diffuse += uLightColor[i] * clamp(diffuseDot, 0.0, 1.0);
         }
 
         gl_FragColor = clamp(vColor * diffuse, 0.0, 1.0);
