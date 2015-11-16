@@ -49,27 +49,19 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	private int mHeight;
 	private long mLastTime;
 	private int mFPS;
+
 	private GLTriangle mTriangle;
 	private GLCube mCube;
-	private GLShader mShader;
 
-	//pass the reference to global Shader instance
-	public void setShader(GLShader shader)
+	private Globals mGlobals;
+
+	//pass the reference to global Shaders/Lights instance
+	public void setGlobals(Globals globals)
 	{
-		mShader = shader;
+		mGlobals = globals;
 	}
 
-	public static int loadShader(int type, String shaderCode)
-	{
-		int shader = glCreateShader(type);
-
-		glShaderSource(shader, shaderCode);
-		glCompileShader(shader);
-
-		return shader;
-	}
-
-	public void GLRenderer()
+	public GLRenderer()
 	{
 		mFirstDraw = true;
 		mSurfaceCreated = false;
@@ -81,7 +73,24 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void initOnce()
 	{
-		glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
+		float[] mPos1 = {-10f, 30f, 40f};
+		float[] mPos2 = {20f, 60f, 0f};
+		float[] mPos3 = {0f, -50f, 3f};
+
+		float[] mCol1 = {1f, 1f, 1f, 1f};
+		float[] mCol2 = {1f, 0f, 0f, 1f};
+		float[] mCol3 = {0f, 0f, 1f, 1f};
+
+		mGlobals.glLights.addLight(mPos1, mCol1);
+//		mGlobals.glLights.addLight(mPos2, mCol2);
+//		mGlobals.glLights.addLight(mPos3, mCol3);
+
+		mGlobals.resetCameraPositions();
+		mGlobals.cameraPosition.put(new float[] {0.0f, 0.0f, 3.0f});
+		mGlobals.cameraLookAt.put(new float[] {0.0f, 0.0f, 0.0f});
+		mGlobals.cameraUp.put(new float[] {0.0f, 1.0f, 0.0f});
+
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		// Enable depth test
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 		// Accept fragment if it closer to the camera than the former one
@@ -95,14 +104,16 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		glViewport(0, 0, mWidth, mHeight);
 
 //		mTriangle = new GLTriangle(-0.8f, -0.8f, 0f, 0.8f, -0.8f, 0f, -0.8f, 0.8f, 0f);
+/*
 		mTriangle = new GLTriangle();
-		mTriangle.setShader(mShader);
+		mTriangle.setGlobals(mGlobals);
 		mTriangle.setTrianglePositions(0.0f, 0.577350269f, 0.0f, -0.5f, -0.28867513459f, 0.0f, 0.5f, -0.28867513459f, 0.0f);
 		mTriangle.setTriangleColors(1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
 		mTriangle.init();
+*/
 
 		mCube = new GLCube();
-		mCube.setShader(mShader);
+		mCube.setGlobals(mGlobals);
 		mCube.init();
 	}
 
@@ -182,24 +193,35 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void onDrawFrame(boolean firstDraw)
 	{
-		float[] mRotationMatrix = new float[16];
-		float[] scratch = new float[16];
+		float[] mRotMatrixX = new float[16];
+		float[] mRotMatrixY = new float[16];
+		float[] scratch1 = new float[16];
+		float[] scratch2 = new float[16];
+		float[] scratch3 = new float[16];
+		float[] scratch4 = new float[16];
 
 //    Utils.log("Frame drawn @" + getFPS() + "FPS");
 		initFrame();
 
 		// Set the camera position (View matrix)
-		Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+		Matrix.setLookAtM(mViewMatrix, 0,
+			mGlobals.cameraPosition.get(0), mGlobals.cameraPosition.get(1), mGlobals.cameraPosition.get(2),
+			mGlobals.cameraLookAt.get(0), mGlobals.cameraLookAt.get(1), mGlobals.cameraLookAt.get(2),
+			mGlobals.cameraUp.get(0), mGlobals.cameraUp.get(1), mGlobals.cameraUp.get(2));
 
 		// Calculate the projection and view transformation
-		Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+		Matrix.multiplyMM(scratch1, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
 		long time = SystemClock.uptimeMillis();
 		float angle = 0.080f * ((int) time);
-		Matrix.setRotateM(mRotationMatrix, 0, angle, 0.0f, 0.0f, -1.0f);
+		Matrix.setRotateM(mRotMatrixX, 0, angle * 1.000000f, 1.0f, 0.0f, 0.0f);
+		Matrix.setRotateM(mRotMatrixY, 0, angle * 0.678957f, 0.0f, 1.0f, 0.0f);
 
-		Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+		Matrix.multiplyMM(scratch2, 0, scratch1, 0, mRotMatrixX, 0);
+		Matrix.multiplyMM(scratch3, 0, scratch2, 0, mRotMatrixY, 0);
+		Matrix.scaleM(scratch4, 0, scratch3, 0, 0.4f, 0.4f, 0.4f);
 
+/*
 		float sinValue1 = (float) (Math.sin(angle * 0.017f) + 1) * 0.5f;
 		float sinValue2 = (float) (Math.sin(angle * 0.027f) + 1) * 0.5f;
 		float sinValue3 = (float) (Math.sin(angle * 0.043f) + 1) * 0.5f;
@@ -207,9 +229,9 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mTriangle.setColor(0, 1.0f, 0.0f, sinValue1, 1.0f);
 		mTriangle.setColor(1, sinValue2, 1.0f, 0.0f, 1.0f);
 		mTriangle.setColor(2, 0.0f, sinValue3, 1.0f, 1.0f);
-
-//		mCube.draw(mMVPMatrix);
-		mTriangle.draw(scratch);
+*/
+		mCube.draw(scratch4);
+		//mTriangle.draw(scratch4);
 
 		// Draw shape
 		//mTriangle.draw(mMVPMatrix);

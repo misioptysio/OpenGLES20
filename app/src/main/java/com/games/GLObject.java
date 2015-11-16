@@ -22,16 +22,9 @@ public abstract class GLObject
 {
   protected boolean[] buffersUsed = {false, false, false, false};
 
-  //protected static final int POSITION_OFFSET = 0;
-  //protected static final int COLOR_OFFSET = POSITION_OFFSET + VALUES_PER_POSITION;
-  //protected static final int NORMAL_OFFSET = COLOR_OFFSET + VALUES_PER_V_COLOR;
-
-  //protected static final int VALUES_PER_V_POSITION = VALUES_PER_POSITION + VALUES_PER_V_COLOR + VALUES_PER_V_NORMAL;
-  //protected static final int STRIDE = VALUES_PER_V_POSITION * BYTES_PER_FLOAT;
-
   protected int vertexCount = 3;
 
-  protected GLShader mShader;
+  protected Globals mGlobals;
   protected GLMaterial mMaterial;
   protected FloatBuffer positionBuffer;
   protected FloatBuffer colorBuffer;
@@ -43,15 +36,15 @@ public abstract class GLObject
   protected int mVertexShader;
   protected int mFragmentShader;
 
-  public void setShader(GLShader shader)
+  public void setGlobals(Globals globals)
   {
-    mShader = shader;
+    mGlobals = globals;
   }
 
   public void initShaders(int shaderID)
   {
-    mVertexShader = GLRenderer.loadShader(GL_VERTEX_SHADER, mShader.getVertexShader(shaderID));
-    mFragmentShader = GLRenderer.loadShader(GL_FRAGMENT_SHADER, mShader.getFragmentShader(shaderID));
+    mVertexShader = mGlobals.glShaders.loadShader(GL_VERTEX_SHADER, mGlobals.getVertexShader(shaderID));
+    mFragmentShader = mGlobals.glShaders.loadShader(GL_FRAGMENT_SHADER, mGlobals.getFragmentShader(shaderID));
   }
 
   public void initProgram()
