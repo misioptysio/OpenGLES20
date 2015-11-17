@@ -240,12 +240,11 @@ public class GLCube extends GLObject
     if (uLightColorHandle != -1)
       glUniform4fv(uLightColorHandle, mGlobals.glLights.lightCount, mGlobals.glLights.lightColor);
 */
-		float[] camPos = new float[] {0.0f, 0.0f, 3.0f};
 		float[] lightPos = new float[] {0.0f, 0.0f, -40.0f};
 		float[] lightCol = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
 
 		if (uCameraPositionHandle != -1)
-			glUniform3fv(uCameraPositionHandle, 1, camPos, 0);
+			glUniform3fv(uCameraPositionHandle, 1, mGlobals.cameraPosition, 0);
 
 		if (uLightPositionHandle != -1)
 			glUniform3fv(uLightPositionHandle, 1, lightPos, 0);

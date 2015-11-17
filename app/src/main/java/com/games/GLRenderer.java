@@ -86,10 +86,9 @@ public class GLRenderer implements GLSurfaceView.Renderer
 //		mGlobals.glLights.addLight(mPos2, mCol2);
 //		mGlobals.glLights.addLight(mPos3, mCol3);
 
-		mGlobals.resetCameraPositions();
-		mGlobals.cameraPosition.put(new float[] {0.0f, 0.0f, 3.0f});
-		mGlobals.cameraLookAt.put(new float[] {0.0f, 0.0f, 0.0f});
-		mGlobals.cameraUp.put(new float[] {0.0f, 1.0f, 0.0f});
+		mGlobals.cameraPosition = new float[] {0.0f, 0.0f, 3.0f};
+		mGlobals.cameraLookAt = new float[] {0.0f, 0.0f, 0.0f};
+		mGlobals.cameraUp = new float[] {0.0f, 1.0f, 0.0f};
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		// Enable depth test
@@ -205,7 +204,10 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		initFrame();
 
 		// Set the camera position (View matrix)
-		Matrix.setLookAtM(mViewMatrix, 0, mGlobals.cameraPosition.get(0), mGlobals.cameraPosition.get(1), mGlobals.cameraPosition.get(2), mGlobals.cameraLookAt.get(0), mGlobals.cameraLookAt.get(1), mGlobals.cameraLookAt.get(2), mGlobals.cameraUp.get(0), mGlobals.cameraUp.get(1), mGlobals.cameraUp.get(2));
+		Matrix.setLookAtM(mViewMatrix, 0,
+			mGlobals.cameraPosition[0], mGlobals.cameraPosition[1], mGlobals.cameraPosition[2],
+			mGlobals.cameraLookAt[0], mGlobals.cameraLookAt[1], mGlobals.cameraLookAt[2],
+			mGlobals.cameraUp[0], mGlobals.cameraUp[1], mGlobals.cameraUp[2]);
 
 		// Calculate the projection and view transformation
 		Matrix.multiplyMM(scratch1, 0, mProjectionMatrix, 0, mViewMatrix, 0);

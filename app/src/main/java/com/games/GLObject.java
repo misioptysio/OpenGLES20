@@ -1,5 +1,7 @@
 package com.games;
 
+import android.opengl.Matrix;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -26,6 +28,12 @@ public abstract class GLObject
 
   protected Globals mGlobals;
   protected GLMaterial mMaterial;
+  protected float[] mRotationMatrix = new float[16];
+  protected float[] mScaleMatrix = new float[16];
+  protected float[] mTranslationMatrix = new float[16];
+  protected float[] mRSMatrix = new float[16];
+  protected float[] mTRSMatrix = new float[16];
+
   protected FloatBuffer positionBuffer;
   protected FloatBuffer colorBuffer;
   protected FloatBuffer textureBuffer;
@@ -142,6 +150,36 @@ public abstract class GLObject
   {
     textureBuffer.put(i * VALUES_PER_V_TEXTURE + 0, t);
     textureBuffer.put(i * VALUES_PER_V_TEXTURE + 1, s);
+  }
+
+  public void setTranslation(float x, float y, float z)
+  {
+
+  }
+
+  public void setRotation(float angle, float x, float y, float z, boolean multiply)
+  {
+    float[] tempRotationMatrix = new float[16];
+
+    Matrix.setRotateM(tempRotationMatrix, 0, angle, x, y, z);
+    if (multiply)
+      mRotationMatrix = tempRotationMatrix;
+    else
+      Matrix.multiplyMM(mRotationMatrix, 0, mRotationMatrix, 0, tempRotationMatrix, 0);
+
+    recalculateMatrices();
+  }
+
+  public void setScale(float sx, float sy, float sz)
+  {
+    Matrix.scaleM(mScaleMatrix, 0, mGlobals.identityMatrix, 0, sx, sy, sz);
+    recalculateMatrices();
+  }
+
+  public void recalculateMatrices()
+  {
+    Matrix.multiplyMM(mRSMatrix, 0, mRotationMatrix, 0, mScaleMatrix, 0);
+    Matrix.multiplyMM(mTRSMatrix, 0, mTranslationMatrix, 0, mRSMatrix, 0);
   }
 
   public abstract void init();
