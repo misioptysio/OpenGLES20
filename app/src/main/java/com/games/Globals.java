@@ -28,7 +28,7 @@ public class Globals
   public String getVertexShader(int id)
   {
     String res = glShaders.getVertexShader(id);
-    res = "const int LIGHT_COUNT = " + glLights.lightCount + "; " + res;
+    res = "const int LIGHT_COUNT = " + glLights.mLightCount + "; " + res;
 
     return res;
   }
@@ -36,19 +36,8 @@ public class Globals
   public String getFragmentShader(int id)
   {
     String res = glShaders.getFragmentShader(id);
-    res = "const int LIGHT_COUNT = " + glLights.lightCount + "; " + res;
+    res = "const int LIGHT_COUNT = " + glLights.mLightCount + "; " + res;
 
     return res;
   }
-
-  public void resetBufferPositions()
-  {
-    resetLightPositions();
-  }
-
-  public void resetLightPositions()
-  {
-    glLights.resetLightPositions();
-  }
-
 }

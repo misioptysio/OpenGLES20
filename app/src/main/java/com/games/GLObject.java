@@ -48,6 +48,7 @@ public abstract class GLObject
   {
     mRSMatrix = identityMatrix.clone();
     mTRSMatrix = identityMatrix.clone();
+    mTranslationMatrix = identityMatrix.clone();
     mScaleMatrix = identityMatrix.clone();
     mRotationMatrix = identityMatrix.clone();
   }

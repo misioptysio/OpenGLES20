@@ -150,8 +150,8 @@ public class GLCube extends GLObject
     for (int i=0; i < 24; i++)
     {
       //colorArray[i * 4 + 0] = 1.0f;
-      //colorArray[i * 4 + 1] = 0.8f;
-      //colorArray[i * 4 + 2] = 0.0f;
+      //colorArray[i * 4 + 1] = 1.0f;
+      //colorArray[i * 4 + 2] = 1.0f;
     }
     colorBuffer.put(colorArray).position(0);
 
@@ -230,7 +230,7 @@ public class GLCube extends GLObject
     glVertexAttribPointer(aNormalHandle, VALUES_PER_V_NORMAL, GL_FLOAT, false, 0, normalBuffer);
     glEnableVertexAttribArray(aNormalHandle);
 
-    Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mRSMatrix, 0);
+    Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mTRSMatrix, 0);
     // get handle to shape's transformation matrix
     uMVPMatrixHandle = glGetUniformLocation(mProgram, "uMVPMatrix");
     glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mMVPMatrix, 0);
@@ -242,28 +242,14 @@ public class GLCube extends GLObject
     uLightPositionHandle = glGetUniformLocation(mProgram, "uLightPosition");
     uLightColorHandle = glGetUniformLocation(mProgram, "uLightColor");
 
-		/*
-    mGlobals.resetBufferPositions();
-    if (uCameraPositionHandle != -1)
-      glUniform3fv(uCameraPositionHandle, 1, mGlobals.cameraPosition);
-
-    if (uLightPositionHandle != -1)
-      glUniform3fv(uLightPositionHandle, mGlobals.glLights.lightCount, mGlobals.glLights.lightPosition);
-
-    if (uLightColorHandle != -1)
-      glUniform4fv(uLightColorHandle, mGlobals.glLights.lightCount, mGlobals.glLights.lightColor);
-*/
-		float[] lightPos = new float[] {-10.0f, 30.0f, 40.0f};
-		float[] lightCol = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
-
 		if (uCameraPositionHandle != -1)
 			glUniform3fv(uCameraPositionHandle, 1, mGlobals.cameraPosition, 0);
 
 		if (uLightPositionHandle != -1)
-			glUniform3fv(uLightPositionHandle, 1, lightPos, 0);
+			glUniform3fv(uLightPositionHandle, mGlobals.glLights.mLightCount, mGlobals.glLights.mLightPosition, 0);
 
 		if (uLightColorHandle != -1)
-			glUniform4fv(uLightColorHandle, 1, lightCol, 0);
+			glUniform4fv(uLightColorHandle, mGlobals.glLights.mLightCount, mGlobals.glLights.mLightColor, 0);
 
 		// Draw the cube
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, drawListBuffer);

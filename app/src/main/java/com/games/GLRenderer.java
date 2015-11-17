@@ -74,19 +74,22 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void initOnce()
 	{
-		float[] mPos1 = {-10f, 30f, 40f};
-		float[] mPos2 = {20f, 60f, 0f};
-		float[] mPos3 = {0f, -50f, 3f};
+		float[] mPos1 = {10f, 5f, 40f};
+		float[] mPos2 = {20f, -5f, 5f};
+		float[] mPos3 = {0f, 50f, 5f};
 
-		float[] mCol1 = {1f, 1f, 1f, 1f};
-		float[] mCol2 = {1f, 0f, 0f, 1f};
-		float[] mCol3 = {0f, 0f, 1f, 1f};
+		float[] mCol1 = {0.5f, 0.5f, 0.5f, 1f};
+		float[] mCol2 = {0.5f, 0.5f, 0.8f, 1f};
+		float[] mCol3 = {0.8f, 0.5f, 0.5f, 1f};
 
 		mGlobals.glLights.addLight(mPos1, mCol1);
-//		mGlobals.glLights.addLight(mPos2, mCol2);
-//		mGlobals.glLights.addLight(mPos3, mCol3);
+		mGlobals.glLights.addLight(mPos2, mCol2);
+		mGlobals.glLights.addLight(mPos3, mCol3);
 
-		mGlobals.cameraPosition = new float[] {0.0f, 0.0f, 3.0f};
+//		mGlobals.glLights.delLight(0);
+//		mGlobals.glLights.delLight(0);
+
+		mGlobals.cameraPosition = new float[] {0.0f, 0.0f, 5.0f};
 		mGlobals.cameraLookAt = new float[] {0.0f, 0.0f, 0.0f};
 		mGlobals.cameraUp = new float[] {0.0f, 1.0f, 0.0f};
 
@@ -116,11 +119,11 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		float ratio = (float) mWidth / mHeight;
 		if (ratio < 1.0)
 		{
-			Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 2, 7);
+			Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 10);
 		}
 		else
 		{
-			Matrix.frustumM(mProjectionMatrix, 0, -1, 1, -1.0f/ratio, 1.0f/ratio, 2, 7);
+			Matrix.frustumM(mProjectionMatrix, 0, -1, 1, -1.0f/ratio, 1.0f/ratio, 1, 10);
 		}
 	}
 
@@ -184,32 +187,21 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void onDrawFrame(boolean firstDraw)
 	{
-		float[] mRotMatrixX = new float[16];
-		float[] mRotMatrixY = new float[16];
-		float[] scratch1 = new float[16];
-		float[] scratch2 = new float[16];
-		float[] scratch3 = new float[16];
-		float[] scratch4 = new float[16];
 		float[] mVPMatrix = new float[16];
 
 //    Utils.log("Frame drawn @" + getFPS() + "FPS");
 		initFrame();
 
 		// Set the camera position (View matrix)
-		Matrix.setLookAtM(mViewMatrix, 0,
-			mGlobals.cameraPosition[0], mGlobals.cameraPosition[1], mGlobals.cameraPosition[2],
-			mGlobals.cameraLookAt[0], mGlobals.cameraLookAt[1], mGlobals.cameraLookAt[2],
-			mGlobals.cameraUp[0], mGlobals.cameraUp[1], mGlobals.cameraUp[2]);
-
-		// Calculate the projection and view transformation
-		Matrix.multiplyMM(scratch1, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+		Matrix.setLookAtM(mViewMatrix, 0, mGlobals.cameraPosition[0], mGlobals.cameraPosition[1], mGlobals.cameraPosition[2], mGlobals.cameraLookAt[0], mGlobals.cameraLookAt[1], mGlobals.cameraLookAt[2], mGlobals.cameraUp[0], mGlobals.cameraUp[1], mGlobals.cameraUp[2]);
 
 		long time = SystemClock.uptimeMillis();
-		float angle = 0.1000f * ((int) time);
+		float angle = 0.0600f * ((int) time);
 
 		mCube.setRotation(angle * 1.000000f, 1.0f, 0.0f, 0.0f, false);
 		mCube.setRotation(angle * 0.278957f, 0.0f, 1.0f, 0.0f, true);
-		mCube.setScale(0.4f, 0.4f, 0.4f);
+		mCube.setScale(1.2f, 1.2f, 1.2f);
+		//mCube.setTranslation((float) Math.cos(0.028f * angle), (float) Math.sin(0.023f * angle), 0.0f);
 		Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
 		mCube.draw(mVPMatrix);
