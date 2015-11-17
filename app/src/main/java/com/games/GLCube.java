@@ -1,6 +1,7 @@
 package com.games;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -146,6 +147,12 @@ public class GLCube extends GLObject
       1.0f, 1.0f, 0.0f, 1.0f, //RG
       1.0f, 1.0f, 0.0f, 1.0f //RG
     };
+    for (int i=0; i < 24; i++)
+    {
+      //colorArray[i * 4 + 0] = 1.0f;
+      //colorArray[i * 4 + 1] = 0.8f;
+      //colorArray[i * 4 + 2] = 0.0f;
+    }
     colorBuffer.put(colorArray).position(0);
 
     short drawListArray1[] =
@@ -186,18 +193,20 @@ public class GLCube extends GLObject
     glLinkProgram(mProgram);
     glGetProgramiv(mProgram, GL_LINK_STATUS, IntBuffer.wrap(res));
     String log = glGetProgramInfoLog(mProgram);
-    Utils.log("Linking program: " + (log == "" ? "CLEAN" : log));
+    Utils.log("Linking program: " + (log.length() == 0 ? "CLEAN" : log));
   }
 
-  public void draw(float[] mvpMatrix)
+  public void draw(float[] mVPMatrix)
   {
     int uMVPMatrixHandle;
+    int uRSMatrixHandle;
     int uCameraPositionHandle;
     int uLightPositionHandle;
     int uLightColorHandle;
     int aPositionHandle;
     int aColorHandle;
     int aNormalHandle;
+    float[] mMVPMatrix = new float[16];
 
     aColorHandle = glGetAttribLocation(mProgram, "aColor");
     aPositionHandle = glGetAttribLocation(mProgram, "aPosition");
@@ -221,9 +230,13 @@ public class GLCube extends GLObject
     glVertexAttribPointer(aNormalHandle, VALUES_PER_V_NORMAL, GL_FLOAT, false, 0, normalBuffer);
     glEnableVertexAttribArray(aNormalHandle);
 
+    Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mRSMatrix, 0);
     // get handle to shape's transformation matrix
     uMVPMatrixHandle = glGetUniformLocation(mProgram, "uMVPMatrix");
-    glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mvpMatrix, 0);
+    glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+
+    uRSMatrixHandle = glGetUniformLocation(mProgram, "uRSMatrix");
+    glUniformMatrix4fv(uRSMatrixHandle, 1, false, mRSMatrix, 0);
 
     uCameraPositionHandle = glGetUniformLocation(mProgram, "uCameraPosition");
     uLightPositionHandle = glGetUniformLocation(mProgram, "uLightPosition");
@@ -240,7 +253,7 @@ public class GLCube extends GLObject
     if (uLightColorHandle != -1)
       glUniform4fv(uLightColorHandle, mGlobals.glLights.lightCount, mGlobals.glLights.lightColor);
 */
-		float[] lightPos = new float[] {0.0f, 0.0f, -40.0f};
+		float[] lightPos = new float[] {-10.0f, 30.0f, 40.0f};
 		float[] lightCol = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
 
 		if (uCameraPositionHandle != -1)

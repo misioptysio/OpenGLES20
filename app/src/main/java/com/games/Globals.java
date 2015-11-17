@@ -7,13 +7,6 @@ import android.content.Context;
  */
 public class Globals
 {
-  public static final float[] zeroMatrix = new float[]{
-    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
-  };
-
-  public static final float[] identityMatrix = new float[]{
-    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
-  };
   public GLLights glLights;
   public GLShaders glShaders;
 

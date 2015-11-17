@@ -20,4 +20,12 @@ public final class Const
   protected static final int VALUES_PER_V_COLOR = 4;
   protected static final int VALUES_PER_V_NORMAL = 3;
   protected static final int VALUES_PER_V_TEXTURE = 2;
+
+  public static final float[] zeroMatrix = new float[]{
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+  };
+
+  public static final float[] identityMatrix = new float[]{
+    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+  };
 }

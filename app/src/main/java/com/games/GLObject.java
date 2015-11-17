@@ -44,6 +44,14 @@ public abstract class GLObject
   protected int mVertexShader;
   protected int mFragmentShader;
 
+  public GLObject()
+  {
+    mRSMatrix = identityMatrix.clone();
+    mTRSMatrix = identityMatrix.clone();
+    mScaleMatrix = identityMatrix.clone();
+    mRotationMatrix = identityMatrix.clone();
+  }
+
   public void setGlobals(Globals globals)
   {
     mGlobals = globals;
@@ -152,9 +160,10 @@ public abstract class GLObject
     textureBuffer.put(i * VALUES_PER_V_TEXTURE + 1, s);
   }
 
-  public void setTranslation(float x, float y, float z)
+  public void setTranslation(float tx, float ty, float tz)
   {
-
+    Matrix.translateM(mTranslationMatrix, 0, identityMatrix, 0, tx, ty, tz);
+    recalculateMatrices();
   }
 
   public void setRotation(float angle, float x, float y, float z, boolean multiply)
@@ -163,16 +172,20 @@ public abstract class GLObject
 
     Matrix.setRotateM(tempRotationMatrix, 0, angle, x, y, z);
     if (multiply)
-      mRotationMatrix = tempRotationMatrix;
+    {
+      float[] tempMultMatrix = new float[16];
+      Matrix.multiplyMM(tempMultMatrix, 0, mRotationMatrix, 0, tempRotationMatrix, 0);
+      mRotationMatrix = tempMultMatrix;
+    }
     else
-      Matrix.multiplyMM(mRotationMatrix, 0, mRotationMatrix, 0, tempRotationMatrix, 0);
+      mRotationMatrix = tempRotationMatrix;
 
     recalculateMatrices();
   }
 
   public void setScale(float sx, float sy, float sz)
   {
-    Matrix.scaleM(mScaleMatrix, 0, mGlobals.identityMatrix, 0, sx, sy, sz);
+    Matrix.scaleM(mScaleMatrix, 0, identityMatrix, 0, sx, sy, sz);
     recalculateMatrices();
   }
 

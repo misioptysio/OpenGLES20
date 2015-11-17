@@ -103,15 +103,6 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 		glViewport(0, 0, mWidth, mHeight);
 
-//		mTriangle = new GLTriangle(-0.8f, -0.8f, 0f, 0.8f, -0.8f, 0f, -0.8f, 0.8f, 0f);
-/*
-		mTriangle = new GLTriangle();
-		mTriangle.setGlobals(mGlobals);
-		mTriangle.setTrianglePositions(0.0f, 0.577350269f, 0.0f, -0.5f, -0.28867513459f, 0.0f, 0.5f, -0.28867513459f, 0.0f);
-		mTriangle.setTriangleColors(1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-		mTriangle.init();
-*/
-
 		mCube = new GLCube();
 		mCube.setGlobals(mGlobals);
 		mCube.init();
@@ -199,6 +190,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		float[] scratch2 = new float[16];
 		float[] scratch3 = new float[16];
 		float[] scratch4 = new float[16];
+		float[] mVPMatrix = new float[16];
 
 //    Utils.log("Frame drawn @" + getFPS() + "FPS");
 		initFrame();
@@ -213,28 +205,14 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		Matrix.multiplyMM(scratch1, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
 		long time = SystemClock.uptimeMillis();
-		float angle = 0.0150f * ((int) time);
-		Matrix.setRotateM(mRotMatrixX, 0, angle * 1.000000f, 1.0f, 0.0f, 0.0f);
-		Matrix.setRotateM(mRotMatrixY, 0, angle * 0.678957f, 0.0f, 1.0f, 0.0f);
+		float angle = 0.1000f * ((int) time);
 
-		Matrix.multiplyMM(scratch2, 0, scratch1, 0, mRotMatrixX, 0);
-		Matrix.multiplyMM(scratch3, 0, scratch2, 0, mRotMatrixY, 0);
-		Matrix.scaleM(scratch4, 0, scratch3, 0, 0.4f, 0.4f, 0.4f);
+		mCube.setRotation(angle * 1.000000f, 1.0f, 0.0f, 0.0f, false);
+		mCube.setRotation(angle * 0.278957f, 0.0f, 1.0f, 0.0f, true);
+		mCube.setScale(0.4f, 0.4f, 0.4f);
+		Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-/*
-		float sinValue1 = (float) (Math.sin(angle * 0.017f) + 1) * 0.5f;
-		float sinValue2 = (float) (Math.sin(angle * 0.027f) + 1) * 0.5f;
-		float sinValue3 = (float) (Math.sin(angle * 0.043f) + 1) * 0.5f;
-
-		mTriangle.setColor(0, 1.0f, 0.0f, sinValue1, 1.0f);
-		mTriangle.setColor(1, sinValue2, 1.0f, 0.0f, 1.0f);
-		mTriangle.setColor(2, 0.0f, sinValue3, 1.0f, 1.0f);
-*/
-		mCube.draw(scratch4);
-		//mTriangle.draw(scratch4);
-
-		// Draw shape
-		//mTriangle.draw(mMVPMatrix);
+		mCube.draw(mVPMatrix);
 	}
 
 }
