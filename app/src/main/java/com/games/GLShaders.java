@@ -4,6 +4,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.opengl.GLES20;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static android.opengl.GLES20.glCompileShader;
 import static android.opengl.GLES20.glCreateShader;
 import static android.opengl.GLES20.glShaderSource;
@@ -13,66 +20,179 @@ import static android.opengl.GLES20.glShaderSource;
  */
 public class GLShaders
 {
-	//
-	public final int TYPE_VS = 0;
-	public final int TYPE_FS = 1;
+  public final int SHADER_TYPE_UNKNOWN = -1;
+  public final int SHADER_TYPE_VERTEX = 0;
+  public final int SHADER_TYPE_FRAGMENT = 1;
 
-	public final int SHADER_DEFAULT = 0;
-	public final int SHADER_SIMPLE = 1;
-	public final int SHADER_MATRIX = 2;
-	public final int SHADER_PHONG = 3;
+  public final int SHADER_NAME_UNKNOWN = -1;
+  public final int SHADER_NAME_DEFAULT = 0;
+  public final int SHADER_NAME_SIMPLE = 1;
+  public final int SHADER_NAME_MATRIX = 2;
+  public final int SHADER_NAME_PHONG = 3;
 
-	private final String VS_DEFAULT = "attribute vec4 aPosition; void main() { gl_Position = aPosition; }";
-	private final String FS_DEFAULT = "precision mediump float; void main() { gl_FragColor = vec4(1., 0., 0., 1.); }";
+  private final String VERTEX_SHADER_DEFAULT_CODE = "attribute vec4 aPosition; void main() { gl_Position = aPosition; }";
+  private final String FRAGMENT_SHADER_DEFAULT_CODE = "precision mediump float; void main() { gl_FragColor = vec4(1., 0., 0., 1.); }";
 
-	private String[][] shaderCode = new String[100][2];
+  private String[][] shaderCode = new String[100][2];
 
-	public GLShaders(Context context)
-	{
-		Resources resources = context.getResources();
+  public GLShaders(Context context)
+  {
+    shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_VERTEX] = VERTEX_SHADER_DEFAULT_CODE;
+    shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_FRAGMENT] = FRAGMENT_SHADER_DEFAULT_CODE;
 
-		shaderCode[SHADER_DEFAULT][TYPE_VS] = VS_DEFAULT;
-		shaderCode[SHADER_DEFAULT][TYPE_FS] = FS_DEFAULT;
+    //read shaders.glsl
+    readShaders(context, R.raw.shaders);
+  }
 
-		shaderCode[SHADER_SIMPLE][TYPE_VS] = resources.getString(R.string.vsSimple);
-		shaderCode[SHADER_SIMPLE][TYPE_FS] = resources.getString(R.string.fsSimple);
+  public int findShaderNameID(String name)
+  {
+    int res;
 
-		shaderCode[SHADER_MATRIX][TYPE_VS] = resources.getString(R.string.vsMatrix);
-		shaderCode[SHADER_MATRIX][TYPE_FS] = resources.getString(R.string.fsMatrix);
+    switch (name)
+    {
+      case "DEFAULT":
+        res = SHADER_NAME_DEFAULT;
+        break;
 
-		shaderCode[SHADER_PHONG][TYPE_VS] = resources.getString(R.string.vsPhong);
-		shaderCode[SHADER_PHONG][TYPE_FS] = resources.getString(R.string.fsPhong);
-	}
+      case "SIMPLE":
+        res = SHADER_NAME_SIMPLE;
+        break;
 
-	public String getVertexShader(int id)
-	{
-		String res = shaderCode[id][TYPE_VS];
+      case "MATRIX":
+        res = SHADER_NAME_MATRIX;
+        break;
 
-		if (res == null)
-			res = shaderCode[0][TYPE_VS];
+      case "PHONG":
+        res = SHADER_NAME_PHONG;
+        break;
 
-		return res;
-	}
+      default:
+        res = SHADER_NAME_UNKNOWN;
+    }
 
-	public String getFragmentShader(int id)
-	{
-		String res = shaderCode[id][TYPE_FS];
+    return res;
+  }
 
-		if (res == null)
-			res = shaderCode[0][TYPE_FS];
+  public int findShaderTypeID(String name)
+  {
+    int res;
 
-		return res;
-	}
+    switch (name)
+    {
+      case "FRAGMENT":
+        res = SHADER_TYPE_FRAGMENT;
+        break;
 
-	public int loadShader(int type, String shaderCode)
-	{
-		int shader = glCreateShader(type);
+      case "VERTEX":
+        res = SHADER_TYPE_VERTEX;
+        break;
 
-		glShaderSource(shader, shaderCode);
-		glCompileShader(shader);
-		String log = GLES20.glGetShaderInfoLog(shader);
-		Utils.log("Shader compile: " + log);
+      default:
+        res = SHADER_TYPE_UNKNOWN;
+    }
 
-		return shader;
-	}
+    return res;
+  }
+
+  public void setShaderCode(int nameID, int typeId, String code)
+  {
+    if ((nameID != SHADER_NAME_UNKNOWN) && (typeId != SHADER_TYPE_UNKNOWN))
+    {
+      if (code.length() != 0)
+      {
+        shaderCode[nameID][typeId] = code;
+      }
+      else
+      {
+        shaderCode[nameID][typeId] = shaderCode[SHADER_NAME_DEFAULT][typeId];
+      }
+    }
+  }
+
+  public void readShaders(final Context context, final int resourceId)
+  {
+    final InputStream inputStream = context.getResources().openRawResource(resourceId);
+    final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+    final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+    Pattern patShader = Pattern.compile("\\#(VERTEX|FRAGMENT)\\s+(.+)");
+    Matcher matcher;
+
+    String nextLine;
+    String shaderName;
+    String shaderType;
+    int shaderNameID;
+    int shaderTypeID;
+    int currentShaderNameID = SHADER_NAME_UNKNOWN;
+    int currentShaderTypeID = SHADER_TYPE_UNKNOWN;
+
+    final StringBuilder body = new StringBuilder();
+
+    try
+    {
+      while ((nextLine = bufferedReader.readLine()) != null)
+      {
+        matcher = patShader.matcher(nextLine);
+        if (matcher.matches())
+        {
+          shaderName = matcher.group(2).trim().toUpperCase();
+          shaderType = matcher.group(1).trim().toUpperCase();
+          shaderNameID = findShaderNameID(shaderName);
+          shaderTypeID = findShaderTypeID(shaderType);
+
+          setShaderCode(currentShaderNameID, currentShaderTypeID, body.toString().trim());
+          currentShaderNameID = shaderNameID;
+          currentShaderTypeID = shaderTypeID;
+
+          body.delete(0, body.length());
+          Utils.log("vertex " + "[" + shaderName + "]");
+        }
+        else
+        {
+          body.append(nextLine + '\n');
+        }
+      }
+    }
+    catch (IOException e)
+    {
+    }
+
+    setShaderCode(currentShaderNameID, currentShaderTypeID, body.toString().trim());
+  }
+
+  public String getVertexShader(int id)
+  {
+    String res = shaderCode[id][SHADER_TYPE_VERTEX];
+
+    if (res == null)
+    {
+      res = shaderCode[0][SHADER_TYPE_VERTEX];
+    }
+
+    return res;
+  }
+
+  public String getFragmentShader(int id)
+  {
+    String res = shaderCode[id][SHADER_TYPE_FRAGMENT];
+
+    if (res == null)
+    {
+      res = shaderCode[0][SHADER_TYPE_FRAGMENT];
+    }
+
+    return res;
+  }
+
+  public int loadShader(int type, String shaderCode)
+  {
+    int shader = glCreateShader(type);
+
+    glShaderSource(shader, shaderCode);
+    glCompileShader(shader);
+    String log = GLES20.glGetShaderInfoLog(shader);
+    Utils.log("Shader compile: " + (log.length() == 0 ? "CLEAN" : log));
+
+    return shader;
+  }
 }

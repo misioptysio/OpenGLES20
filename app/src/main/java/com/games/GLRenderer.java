@@ -30,6 +30,7 @@ Shaders:
 *** http://joshbeam.com/articles/getting_started_with_glsl/
 *** http://www.learnopengles.com/android-lesson-one-getting-started/
 *** http://blog.shayanjaved.com/2011/03/13/shaders-android/
+*   http://codeflow.org/entries/2010/dec/09/minecraft-like-rendering-experiments-in-opengl-4/#texturing
 
 Textures:
 http://stackoverflow.com/questions/1339136/draw-text-in-opengl-es-android
@@ -49,6 +50,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	private int mWidth;
 	private int mHeight;
 	private long mLastTime;
+	private long mStartTime;
 	private int mFPS;
 
 	private GLTriangle mTriangle;
@@ -68,19 +70,20 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mSurfaceCreated = false;
 		mWidth = -1;
 		mHeight = -1;
-		mLastTime = System.currentTimeMillis();
+		mStartTime = System.currentTimeMillis();
+		mLastTime = mStartTime;
 		mFPS = 0;
 	}
 
 	public void initOnce()
 	{
-		float[] mPos1 = {10f, 5f, 40f};
-		float[] mPos2 = {20f, -5f, 5f};
-		float[] mPos3 = {0f, 50f, 5f};
+		float[] mPos1 = {0f, 40f, 0f};
+		float[] mPos2 = {-40f, 0f, 0f};
+		float[] mPos3 = {40f, 0f, 0f};
 
-		float[] mCol1 = {0.5f, 0.5f, 0.5f, 1f};
-		float[] mCol2 = {0.5f, 0.5f, 0.8f, 1f};
-		float[] mCol3 = {0.8f, 0.5f, 0.5f, 1f};
+		float[] mCol1 = {0.0f, 1.0f, 0.0f, 1f};
+		float[] mCol2 = {1.0f, 0.0f, 0.0f, 1f};
+		float[] mCol3 = {0.0f, 0.0f, 1.0f, 1f};
 
 		mGlobals.glLights.addLight(mPos1, mCol1);
 		mGlobals.glLights.addLight(mPos2, mCol2);
@@ -195,11 +198,11 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		// Set the camera position (View matrix)
 		Matrix.setLookAtM(mViewMatrix, 0, mGlobals.cameraPosition[0], mGlobals.cameraPosition[1], mGlobals.cameraPosition[2], mGlobals.cameraLookAt[0], mGlobals.cameraLookAt[1], mGlobals.cameraLookAt[2], mGlobals.cameraUp[0], mGlobals.cameraUp[1], mGlobals.cameraUp[2]);
 
-		long time = SystemClock.uptimeMillis();
-		float angle = 0.0600f * ((int) time);
+		float time = (System.currentTimeMillis() - mStartTime) * 0.001f;
+		float angle = 1.0000f * time;
 
-		mCube.setRotation(angle * 1.000000f, 1.0f, 0.0f, 0.0f, false);
-		mCube.setRotation(angle * 0.278957f, 0.0f, 1.0f, 0.0f, true);
+//		mCube.setRotation(angle * 1.000000f, 1.0f, 0.0f, 0.0f, false);
+		mCube.setRotation(angle * 15.0f, 0.0f, 1.0f, 0.0f, false);
 		mCube.setScale(1.2f, 1.2f, 1.2f);
 		//mCube.setTranslation((float) Math.cos(0.028f * angle), (float) Math.sin(0.023f * angle), 0.0f);
 		Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);

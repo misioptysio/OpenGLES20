@@ -1,9 +1,7 @@
 package com.games;
 
-import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static android.opengl.GLES20.GL_FLOAT;
@@ -149,9 +147,9 @@ public class GLCube extends GLObject
     };
     for (int i=0; i < 24; i++)
     {
-      //colorArray[i * 4 + 0] = 1.0f;
-      //colorArray[i * 4 + 1] = 1.0f;
-      //colorArray[i * 4 + 2] = 1.0f;
+      colorArray[i * 4 + 0] = 0.8f;
+      colorArray[i * 4 + 1] = 0.8f;
+      colorArray[i * 4 + 2] = 0.8f;
     }
     colorBuffer.put(colorArray).position(0);
 
@@ -182,7 +180,7 @@ public class GLCube extends GLObject
   {
     int[] res = new int[16];
 
-    initShaders(mGlobals.glShaders.SHADER_PHONG);
+    initShaders(mGlobals.glShaders.SHADER_NAME_PHONG);
     initProgram();
 
     // Bind attributes
