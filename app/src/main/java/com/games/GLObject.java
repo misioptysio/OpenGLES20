@@ -33,6 +33,8 @@ public abstract class GLObject
   protected float[] mTranslationMatrix = new float[16];
   protected float[] mRSMatrix = new float[16];
   protected float[] mTRSMatrix = new float[16];
+  protected float[] mInvRSMatrix = new float[16];
+  protected float[] mInvTransposedRSMatrix = new float[16];
 
   protected FloatBuffer positionBuffer;
   protected FloatBuffer colorBuffer;
@@ -194,6 +196,9 @@ public abstract class GLObject
   {
     Matrix.multiplyMM(mRSMatrix, 0, mRotationMatrix, 0, mScaleMatrix, 0);
     Matrix.multiplyMM(mTRSMatrix, 0, mTranslationMatrix, 0, mRSMatrix, 0);
+
+    Matrix.invertM(mInvRSMatrix, 0, mRSMatrix, 0);
+    Matrix.transposeM(mInvTransposedRSMatrix, 0, mInvRSMatrix, 0);
   }
 
   public abstract void init();

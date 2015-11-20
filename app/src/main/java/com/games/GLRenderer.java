@@ -199,10 +199,10 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		Matrix.setLookAtM(mViewMatrix, 0, mGlobals.cameraPosition[0], mGlobals.cameraPosition[1], mGlobals.cameraPosition[2], mGlobals.cameraLookAt[0], mGlobals.cameraLookAt[1], mGlobals.cameraLookAt[2], mGlobals.cameraUp[0], mGlobals.cameraUp[1], mGlobals.cameraUp[2]);
 
 		float time = (System.currentTimeMillis() - mStartTime) * 0.001f;
-		float angle = 1.0000f * time;
+		float angle = -180.0f + (float) 270.0f * ((float) Math.sin(time * 0.3f) + 1.0f) * 0.5f;
 
 //		mCube.setRotation(angle * 1.000000f, 1.0f, 0.0f, 0.0f, false);
-		mCube.setRotation(angle * 15.0f, 0.0f, 1.0f, 0.0f, false);
+		mCube.setRotation(angle, 0.0f, 1.0f, 0.0f, false);
 		mCube.setScale(1.2f, 1.2f, 1.2f);
 		//mCube.setTranslation((float) Math.cos(0.028f * angle), (float) Math.sin(0.023f * angle), 0.0f);
 		Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);

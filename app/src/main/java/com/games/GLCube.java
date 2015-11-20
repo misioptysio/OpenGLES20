@@ -28,6 +28,7 @@ import static com.games.Const.VALUES_PER_V_POSITION;
 import static com.games.Const.V_COLOR;
 import static com.games.Const.V_NORMAL;
 import static com.games.Const.V_POSITION;
+import static com.games.Const.identityMatrix;
 
 /**
  * Created by piotr.plys on 2015-11-13.
@@ -153,25 +154,15 @@ public class GLCube extends GLObject
     }
     colorBuffer.put(colorArray).position(0);
 
-    short drawListArray1[] =
-    {
-      0, 1, 5, 0, 5, 4, //+Z
-      1, 3, 7, 1, 7, 5, //+X
-      3, 2, 6, 3, 6, 7, //-Z
-      2, 0, 4, 2, 4, 6, //-X
-      2, 3, 1, 2, 1, 0, //-Y
-      5, 7, 6, 5, 6, 4  //+Y
-    };
     short drawListArray[] =
-      {
-        2, 5, 17, 2, 17, 14, //+Z
-        3, 9, 21, 3, 21, 15, //+X
-        11, 8, 20, 11, 20, 23, //-Z
-        6, 0, 12, 6, 12, 18, //-X
-        7, 10, 4, 7, 4, 1, //-Y
-        16, 22, 19, 16, 19, 13  //+Y
-      };
-
+    {
+      2, 5, 17, 2, 17, 14, //+Z check
+      3, 9, 21, 3, 21, 15 /*, //+X check
+      11, 8, 20, 11, 20, 23, //-Z
+      6, 0, 12, 6, 12, 18, //-X
+      7, 10, 4, 7, 4, 1, //-Y
+      16, 22, 19, 16, 19, 13  //+Y*/
+    };
     drawListBuffer.put(drawListArray).position(0);
   }
 
@@ -234,7 +225,7 @@ public class GLCube extends GLObject
     glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 
     uRSMatrixHandle = glGetUniformLocation(mProgram, "uRSMatrix");
-    glUniformMatrix4fv(uRSMatrixHandle, 1, false, mRSMatrix, 0);
+    glUniformMatrix4fv(uRSMatrixHandle, 1, false, mInvTransposedRSMatrix, 0);
 
     uCameraPositionHandle = glGetUniformLocation(mProgram, "uCameraPosition");
     uLightPositionHandle = glGetUniformLocation(mProgram, "uLightPosition");
@@ -250,7 +241,7 @@ public class GLCube extends GLObject
 			glUniform4fv(uLightColorHandle, mGlobals.glLights.mLightCount, mGlobals.glLights.mLightColor, 0);
 
 		// Draw the cube
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, drawListBuffer);
+    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, drawListBuffer);
 
     // Disable vertex array
     glDisableVertexAttribArray(aPositionHandle);

@@ -45,25 +45,23 @@
 
 #VERTEX PHONG
 	uniform mat4 uMVPMatrix;
-	uniform mat4 uRSMatrix;
 	uniform vec3 uCameraPosition;
 	uniform vec3 uLightPosition[LIGHT_COUNT];
 
 	attribute vec4 aPosition;
 	attribute vec4 aColor;
-	attribute vec4 aNormal;
+	attribute vec3 aNormal;
 
 	varying vec3 vNormal;
 	varying vec4 vColor;
 	varying vec3 vCameraVector;
 	varying vec3 vLightVector[LIGHT_COUNT];
 
-	vec4 mNormal;
+	vec3 mNormal;
 
 	void main()
 	{
-		mNormal = uRSMatrix * aNormal;
-		vNormal = mNormal.xyz;
+		vNormal = aNormal.xyz;
 		vCameraVector = uCameraPosition - aPosition.xyz;
 
 		for (int i = 0; i < LIGHT_COUNT; i++)
@@ -77,6 +75,7 @@
 	precision mediump float;
 
 	uniform vec4 uLightColor[LIGHT_COUNT];
+	uniform mat4 uRSMatrix;
 
 	varying vec3 vCameraVector;
 	varying vec3 vLightVector[LIGHT_COUNT];
@@ -89,20 +88,26 @@
 		vec4 diffuse = vec4(0.0, 0.0, 0.0, 1.0);
 		vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
-		vec3 normalDir = normalize(vNormal);
+		vec3 normalDir = normalize(mat3(uRSMatrix) * vNormal);
+		//vec3 normalDir = normalize(vNormal);
 		vec3 cameraDir = normalize(vCameraVector);
 
 		for (int i = 0; i < LIGHT_COUNT; i++)
 		{
 			vec3 lightDir = normalize(vLightVector[i]);
-			float diffuseDot = dot(normalDir, lightDir);
+			float mDiffuseDot = dot(normalDir, lightDir);
 
-			diffuse += uLightColor[i] * clamp(diffuseDot, 0.0, 1.0);
+			diffuse += uLightColor[i] * clamp(mDiffuseDot, 0.0, 1.0);
 
-			vec3 mHalfAngle = normalize(cameraDir + lightDir);
+			//vec3 mHalfAngle = normalize(cameraDir + lightDir);
+
+			vec3 mReflected = 2.0 * normalDir * mDiffuseDot - lightDir;
+
 			vec4 mSpecularColor = uLightColor[i];
-			float mSpecularDot = dot(normalDir, mHalfAngle);
-			specular += mSpecularColor * pow(clamp(mSpecularDot, 0.0, 1.0), 200.0);
+			//float mSpecularDot = dot(normalDir, mHalfAngle);
+			float mSpecularDot = dot(cameraDir, mReflected);
+
+			specular += mSpecularColor * pow(clamp(mSpecularDot, 0.0, 1.0), 50.0);
 		}
 
 		gl_FragColor = clamp(vColor * diffuse + specular, 0.0, 1.0);
