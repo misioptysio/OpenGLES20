@@ -77,20 +77,20 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void initOnce()
 	{
-		float[] mPos1 = {0f, 40f, 0f};
-		float[] mPos2 = {-40f, 0f, 0f};
-		float[] mPos3 = {40f, 0f, 0f};
+		float[] mPos1 = {0.0f, 8.0f, 2.0f};
+		float[] mPos2 = {0.0f, -8.0f, 2.0f};
+		float[] mPos3 = {-8.0f, 0.0f, 2.0f};
+		float[] mPos4 = {8.0f, 0.0f, 2.0f};
 
-		float[] mCol1 = {0.0f, 1.0f, 0.0f, 1f};
-		float[] mCol2 = {1.0f, 0.0f, 0.0f, 1f};
-		float[] mCol3 = {0.0f, 0.0f, 1.0f, 1f};
+		float[] mCol1 = {1.0f, 1.0f, 1.0f, 1f};
+		float[] mCol2 = {1.0f, 1.0f, 1.0f, 1f};
+		float[] mCol3 = {1.0f, 1.0f, 1.0f, 1f};
+		float[] mCol4 = {1.0f, 1.0f, 1.0f, 1f};
 
 		mGlobals.glLights.addLight(mPos1, mCol1);
 		mGlobals.glLights.addLight(mPos2, mCol2);
 		mGlobals.glLights.addLight(mPos3, mCol3);
-
-//		mGlobals.glLights.delLight(0);
-//		mGlobals.glLights.delLight(0);
+		mGlobals.glLights.addLight(mPos4, mCol4);
 
 		mGlobals.cameraPosition = new float[] {0.0f, 0.0f, 5.0f};
 		mGlobals.cameraLookAt = new float[] {0.0f, 0.0f, 0.0f};
@@ -187,10 +187,9 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		}
 	}
 
-
 	public void onDrawFrame(boolean firstDraw)
 	{
-		float[] mVPMatrix = new float[16];
+		float[] mCameraMatrix = new float[16];
 
 //    Utils.log("Frame drawn @" + getFPS() + "FPS");
 		initFrame();
@@ -201,13 +200,13 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		float time = (System.currentTimeMillis() - mStartTime) * 0.001f;
 		float angle = -180.0f + (float) 270.0f * ((float) Math.sin(time * 0.3f) + 1.0f) * 0.5f;
 
-//		mCube.setRotation(angle * 1.000000f, 1.0f, 0.0f, 0.0f, false);
-		mCube.setRotation(angle, 0.0f, 1.0f, 0.0f, false);
-		mCube.setScale(1.2f, 1.2f, 1.2f);
+		mCube.setRotation(time * 30.2340f, 1.0f, 0.0f, 0.0f, false);
+		mCube.setRotation(time * 50.4773f, 0.0f, 1.0f, 0.0f, true);
+		mCube.setScale(1.3f, 1.3f, 1.3f);
 		//mCube.setTranslation((float) Math.cos(0.028f * angle), (float) Math.sin(0.023f * angle), 0.0f);
-		Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+		Matrix.multiplyMM(mCameraMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-		mCube.draw(mVPMatrix);
+		mCube.draw(mCameraMatrix);
 	}
 
 }

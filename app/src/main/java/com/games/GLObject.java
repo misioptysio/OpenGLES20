@@ -31,10 +31,10 @@ public abstract class GLObject
   protected float[] mRotationMatrix = new float[16];
   protected float[] mScaleMatrix = new float[16];
   protected float[] mTranslationMatrix = new float[16];
-  protected float[] mRSMatrix = new float[16];
-  protected float[] mTRSMatrix = new float[16];
-  protected float[] mInvRSMatrix = new float[16];
-  protected float[] mInvTransposedRSMatrix = new float[16];
+  protected float[] mNormalMatrix = new float[16];
+  protected float[] mModelMatrix = new float[16];
+  protected float[] mInvNormalMatrix = new float[16];
+  protected float[] mInvTransposedNormalMatrix = new float[16];
 
   protected FloatBuffer positionBuffer;
   protected FloatBuffer colorBuffer;
@@ -48,8 +48,8 @@ public abstract class GLObject
 
   public GLObject()
   {
-    mRSMatrix = identityMatrix.clone();
-    mTRSMatrix = identityMatrix.clone();
+    mNormalMatrix = identityMatrix.clone();
+    mModelMatrix = identityMatrix.clone();
     mTranslationMatrix = identityMatrix.clone();
     mScaleMatrix = identityMatrix.clone();
     mRotationMatrix = identityMatrix.clone();
@@ -194,11 +194,11 @@ public abstract class GLObject
 
   public void recalculateMatrices()
   {
-    Matrix.multiplyMM(mRSMatrix, 0, mRotationMatrix, 0, mScaleMatrix, 0);
-    Matrix.multiplyMM(mTRSMatrix, 0, mTranslationMatrix, 0, mRSMatrix, 0);
+    Matrix.multiplyMM(mNormalMatrix, 0, mRotationMatrix, 0, mScaleMatrix, 0);
+    Matrix.multiplyMM(mModelMatrix, 0, mTranslationMatrix, 0, mNormalMatrix, 0);
 
-    Matrix.invertM(mInvRSMatrix, 0, mRSMatrix, 0);
-    Matrix.transposeM(mInvTransposedRSMatrix, 0, mInvRSMatrix, 0);
+    Matrix.invertM(mInvNormalMatrix, 0, mNormalMatrix, 0);
+    Matrix.transposeM(mInvTransposedNormalMatrix, 0, mInvNormalMatrix, 0);
   }
 
   public abstract void init();

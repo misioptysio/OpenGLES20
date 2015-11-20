@@ -28,7 +28,6 @@ import static com.games.Const.VALUES_PER_V_POSITION;
 import static com.games.Const.V_COLOR;
 import static com.games.Const.V_NORMAL;
 import static com.games.Const.V_POSITION;
-import static com.games.Const.identityMatrix;
 
 /**
  * Created by piotr.plys on 2015-11-13.
@@ -148,20 +147,20 @@ public class GLCube extends GLObject
     };
     for (int i=0; i < 24; i++)
     {
-      colorArray[i * 4 + 0] = 0.8f;
-      colorArray[i * 4 + 1] = 0.8f;
-      colorArray[i * 4 + 2] = 0.8f;
+      //colorArray[i * 4 + 0] = 1.0f;
+      //colorArray[i * 4 + 1] = 0.0f;
+      //colorArray[i * 4 + 2] = 1.0f;
     }
     colorBuffer.put(colorArray).position(0);
 
     short drawListArray[] =
     {
       2, 5, 17, 2, 17, 14, //+Z check
-      3, 9, 21, 3, 21, 15 /*, //+X check
+      3, 15, 9, 15, 21, 9, //+X check
       11, 8, 20, 11, 20, 23, //-Z
       6, 0, 12, 6, 12, 18, //-X
       7, 10, 4, 7, 4, 1, //-Y
-      16, 22, 19, 16, 19, 13  //+Y*/
+      16, 22, 19, 16, 19, 13  //+Y
     };
     drawListBuffer.put(drawListArray).position(0);
   }
@@ -185,10 +184,12 @@ public class GLCube extends GLObject
     Utils.log("Linking program: " + (log.length() == 0 ? "CLEAN" : log));
   }
 
-  public void draw(float[] mVPMatrix)
+  public void draw(float[] mCameraMatrix)
   {
     int uMVPMatrixHandle;
-    int uRSMatrixHandle;
+    int uNormalMatrixHandle;
+    int uModelMatrixHandle;
+    int uCameraMatrixHandle;
     int uCameraPositionHandle;
     int uLightPositionHandle;
     int uLightColorHandle;
@@ -219,13 +220,19 @@ public class GLCube extends GLObject
     glVertexAttribPointer(aNormalHandle, VALUES_PER_V_NORMAL, GL_FLOAT, false, 0, normalBuffer);
     glEnableVertexAttribArray(aNormalHandle);
 
-    Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mTRSMatrix, 0);
+    Matrix.multiplyMM(mMVPMatrix, 0, mCameraMatrix, 0, mModelMatrix, 0);
     // get handle to shape's transformation matrix
     uMVPMatrixHandle = glGetUniformLocation(mProgram, "uMVPMatrix");
     glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mMVPMatrix, 0);
 
-    uRSMatrixHandle = glGetUniformLocation(mProgram, "uRSMatrix");
-    glUniformMatrix4fv(uRSMatrixHandle, 1, false, mInvTransposedRSMatrix, 0);
+    uNormalMatrixHandle = glGetUniformLocation(mProgram, "uNormalMatrix");
+    glUniformMatrix4fv(uNormalMatrixHandle, 1, false, mNormalMatrix, 0);
+
+    uModelMatrixHandle = glGetUniformLocation(mProgram, "uModelMatrix");
+    glUniformMatrix4fv(uModelMatrixHandle, 1, false, mModelMatrix, 0);
+
+    uCameraMatrixHandle = glGetUniformLocation(mProgram, "uCameraMatrix");
+    glUniformMatrix4fv(uCameraMatrixHandle, 1, false, mCameraMatrix, 0);
 
     uCameraPositionHandle = glGetUniformLocation(mProgram, "uCameraPosition");
     uLightPositionHandle = glGetUniformLocation(mProgram, "uLightPosition");
@@ -241,7 +248,7 @@ public class GLCube extends GLObject
 			glUniform4fv(uLightColorHandle, mGlobals.glLights.mLightCount, mGlobals.glLights.mLightColor, 0);
 
 		// Draw the cube
-    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, drawListBuffer);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, drawListBuffer);
 
     // Disable vertex array
     glDisableVertexAttribArray(aPositionHandle);
