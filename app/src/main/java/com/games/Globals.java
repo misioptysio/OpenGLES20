@@ -9,7 +9,7 @@ public class Globals
 {
   public GLLights glLights;
   public GLShaders glShaders;
-
+  public GLTextures glTextures;
 
   public float[] cameraPosition = new float[3];
   public float[] cameraLookAt = new float[3];
@@ -19,6 +19,7 @@ public class Globals
   {
     glLights = new GLLights();
     glShaders = new GLShaders(context);
+    glTextures = new GLTextures(context);
 
     cameraPosition = new float[]{0.0f, 0.0f, 10.0f};
     cameraLookAt = new float[]{0.0f, 0.0f, 0.0f};

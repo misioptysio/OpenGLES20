@@ -24,15 +24,13 @@ public class GLActivity extends Activity
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-    mGlobals = new Globals(this);
-
     if (hasGLES20())
     {
       mGLView = new GLSurfaceView(this);
       mGLView.setEGLContextClientVersion(2);
       mGLView.setPreserveEGLContextOnPause(true);
 
-      mRenderer = new GLRenderer();
+      mRenderer = new GLRenderer(this);
       mGLView.setRenderer(mRenderer);
 //      mGLView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
@@ -41,7 +39,6 @@ public class GLActivity extends Activity
       Utils.log("No support for OpenGL ES 2.0 :(");
     }
 
-    mRenderer.setGlobals(mGlobals);
     setContentView(mGLView);
   }
 

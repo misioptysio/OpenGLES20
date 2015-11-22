@@ -1,9 +1,11 @@
 package com.games;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
+
+import static com.games.Utils.*;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -12,15 +14,15 @@ import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
-import static android.opengl.GLES20.glCompileShader;
-import static android.opengl.GLES20.glCreateShader;
-import static android.opengl.GLES20.glShaderSource;
 import static android.opengl.GLES20.glViewport;
 
+
+
 /*
-tutorials: http://developer.android.com/training/graphics/opengl/draw.html
-http://stackoverflow.com/questions/9371868/android-oncreate-is-not-being-called
-http://developer.android.com/reference/android/opengl/GLSurfaceView.Renderer.html
+tutorials:
+		http://developer.android.com/training/graphics/opengl/draw.html
+		http://stackoverflow.com/questions/9371868/android-oncreate-is-not-being-called
+		http://developer.android.com/reference/android/opengl/GLSurfaceView.Renderer.html
 
 Matrices:
 *   http://www.songho.ca/opengl/gl_transform.html
@@ -31,9 +33,15 @@ Shaders:
 *** http://www.learnopengles.com/android-lesson-one-getting-started/
 *** http://blog.shayanjaved.com/2011/03/13/shaders-android/
 *   http://codeflow.org/entries/2010/dec/09/minecraft-like-rendering-experiments-in-opengl-4/#texturing
+*   https://github.com/antonholmquist/opengl-es-2-0-shaders/tree/master/Shaders
 
 Textures:
-http://stackoverflow.com/questions/1339136/draw-text-in-opengl-es-android
+		http://stackoverflow.com/questions/1339136/draw-text-in-opengl-es-android
+
+Depth of field / blur:
+		http://androidworks-kea.blogspot.com/2013/10/developers-notes-iii-simple-dof-effect.html
+		http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
+		http://encelo.netsons.org/2008/03/23/i-love-depth-of-field/
 
 */
 
@@ -42,6 +50,7 @@ http://stackoverflow.com/questions/1339136/draw-text-in-opengl-es-android
  */
 public class GLRenderer implements GLSurfaceView.Renderer
 {
+	private final Context mContext;
 	private final float[] mMVPMatrix = new float[16];
 	private final float[] mProjectionMatrix = new float[16];
 	private final float[] mViewMatrix = new float[16];
@@ -53,19 +62,13 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	private long mStartTime;
 	private int mFPS;
 
-	private GLTriangle mTriangle;
 	private GLCube mCube;
-
 	private Globals mGlobals;
 
-	//pass the reference to global Shaders/Lights instance
-	public void setGlobals(Globals globals)
+	public GLRenderer(final Context context)
 	{
-		mGlobals = globals;
-	}
+		mContext = context;
 
-	public GLRenderer()
-	{
 		mFirstDraw = true;
 		mSurfaceCreated = false;
 		mWidth = -1;
@@ -77,14 +80,14 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 	public void initOnce()
 	{
-		float[] mPos1 = {0.0f, 8.0f, 2.0f};
-		float[] mPos2 = {0.0f, -8.0f, 2.0f};
-		float[] mPos3 = {-8.0f, 0.0f, 2.0f};
-		float[] mPos4 = {8.0f, 0.0f, 2.0f};
+		float[] mPos1 = {0.0f, 8.0f, 4.0f};
+		float[] mPos2 = {0.0f, 0.0f, 4.0f};
+		float[] mPos3 = {-8.0f, 0.0f, 4.0f};
+		float[] mPos4 = {8.0f, 0.0f, 0.0f};
 
 		float[] mCol1 = {1.0f, 1.0f, 1.0f, 1f};
-		float[] mCol2 = {1.0f, 1.0f, 1.0f, 1f};
-		float[] mCol3 = {1.0f, 1.0f, 1.0f, 1f};
+		float[] mCol2 = {0.2f, 0.2f, 0.2f, 1f};
+		float[] mCol3 = {0.4f, 0.2f, 0.2f, 1f};
 		float[] mCol4 = {1.0f, 1.0f, 1.0f, 1f};
 
 		mGlobals.glLights.addLight(mPos1, mCol1);
@@ -101,6 +104,9 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 		// Accept fragment if it closer to the camera than the former one
 		GLES20.glDepthFunc(GLES20.GL_LESS);
+
+		GLES20.glEnable(GLES20.GL_BLEND);
+		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
 		// enable face culling feature
 		//GLES20.glEnable(GLES20.GL_CULL_FACE);
@@ -138,6 +144,8 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mSurfaceCreated = true;
 		mWidth = -1;
 		mHeight = -1;
+
+		mGlobals = new Globals(mContext);
 	}
 
 	@Override
@@ -193,21 +201,25 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 //    Utils.log("Frame drawn @" + getFPS() + "FPS");
 		initFrame();
+		float time = (System.currentTimeMillis() - mStartTime) * 0.001f;
 
 		// Set the camera position (View matrix)
-		Matrix.setLookAtM(mViewMatrix, 0, mGlobals.cameraPosition[0], mGlobals.cameraPosition[1], mGlobals.cameraPosition[2], mGlobals.cameraLookAt[0], mGlobals.cameraLookAt[1], mGlobals.cameraLookAt[2], mGlobals.cameraUp[0], mGlobals.cameraUp[1], mGlobals.cameraUp[2]);
+		setLookAt(mViewMatrix, mGlobals.cameraPosition, mGlobals.cameraLookAt, mGlobals.cameraUp);
 
-		float time = (System.currentTimeMillis() - mStartTime) * 0.001f;
-		float angle = -180.0f + (float) 270.0f * ((float) Math.sin(time * 0.3f) + 1.0f) * 0.5f;
-
-		mCube.setRotation(time * 30.2340f, 1.0f, 0.0f, 0.0f, false);
+		mCube.setRotation((float) Math.sin(time) * 30.0f, 1.0f, 0.0f, 0.0f, false);
 		mCube.setRotation(time * 50.4773f, 0.0f, 1.0f, 0.0f, true);
 		mCube.setScale(1.3f, 1.3f, 1.3f);
 		//mCube.setTranslation((float) Math.cos(0.028f * angle), (float) Math.sin(0.023f * angle), 0.0f);
+
 		Matrix.multiplyMM(mCameraMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
 		mCube.draw(mCameraMatrix);
 	}
 
 }
+
+// TODO: 2015-11-20 Materials with ambient, specular, diffuse
+// TODO: 2015-11-20 Bumpmapping
+// TODO: 2015-11-20 Transparency
+// TODO: 2015-11-20 Perlin noise implementation
 

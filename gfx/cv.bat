@@ -15,4 +15,4 @@ copy mipmap-xhdpi\*.* ..\app\src\main\res\mipmap-xhdpi
 copy mipmap-xxhdpi\*.* ..\app\src\main\res\mipmap-xxdpi
 copy mipmap-xxxhdpi\*.* ..\app\src\main\res\mipmap-xxxhdpi
 
-copy texture.png ..\app\src\main\res\raw
+copy texture*.png ..\app\src\main\res\raw

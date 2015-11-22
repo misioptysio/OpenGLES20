@@ -1,5 +1,6 @@
 package com.games;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import java.nio.IntBuffer;
@@ -8,6 +9,7 @@ import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_LINK_STATUS;
 import static android.opengl.GLES20.GL_TRIANGLES;
 import static android.opengl.GLES20.GL_UNSIGNED_SHORT;
+import static android.opengl.GLES20.glActiveTexture;
 import static android.opengl.GLES20.glBindAttribLocation;
 import static android.opengl.GLES20.glDisableVertexAttribArray;
 import static android.opengl.GLES20.glDrawElements;
@@ -25,9 +27,11 @@ import static android.opengl.GLES20.glVertexAttribPointer;
 import static com.games.Const.VALUES_PER_V_COLOR;
 import static com.games.Const.VALUES_PER_V_NORMAL;
 import static com.games.Const.VALUES_PER_V_POSITION;
+import static com.games.Const.VALUES_PER_V_TEXTURE;
 import static com.games.Const.V_COLOR;
 import static com.games.Const.V_NORMAL;
 import static com.games.Const.V_POSITION;
+import static com.games.Const.V_TEXTURE;
 
 /**
  * Created by piotr.plys on 2015-11-13.
@@ -40,6 +44,8 @@ public class GLCube extends GLObject
     createBuffer(vertexCount, V_POSITION);
     createBuffer(vertexCount, V_COLOR);
     createBuffer(vertexCount, V_NORMAL);
+    createBuffer(vertexCount, V_TEXTURE);
+
     createDrawListBuffer(36);
 
     float[] positionArray = {
@@ -147,20 +153,56 @@ public class GLCube extends GLObject
     };
     for (int i=0; i < 24; i++)
     {
-      //colorArray[i * 4 + 0] = 1.0f;
-      //colorArray[i * 4 + 1] = 0.0f;
-      //colorArray[i * 4 + 2] = 1.0f;
+      colorArray[i * 4 + 0] = 1.0f;
+      colorArray[i * 4 + 1] = 1.0f;
+      colorArray[i * 4 + 2] = 1.0f;
+      //colorArray[i * 4 + 3] = 0.2f;
     }
     colorBuffer.put(colorArray).position(0);
 
+    float[] textureArray = {
+      0.00f, 0.50f, //0X 00
+      1.00f, 0.50f, //0Y 01
+      0.25f, 0.75f, //0Z 02
+
+      0.75f, 0.50f, //1X 03
+      0.75f, 0.50f, //1Y 04
+      0.50f, 0.75f, //1Z 05
+
+      0.00f, 0.25f, //2X 06
+      1.00f, 0.25f, //2Y 07
+      0.25f, 0.00f, //2Z 08
+
+      0.75f, 0.25f, //3X 09
+      0.75f, 0.25f, //3Y 10
+      0.50f, 0.00f, //3Z 11
+
+      0.25f, 0.50f, //4X 12
+      0.25f, 0.50f, //4Y 13
+      0.25f, 0.50f, //4Z 14
+
+      0.50f, 0.50f, //5X 15
+      0.50f, 0.50f, //5Y 16
+      0.50f, 0.50f, //5Z 17
+
+      0.25f, 0.25f, //6X 18
+      0.25f, 0.25f, //6Y 19
+      0.25f, 0.25f, //6Z 20
+
+      0.50f, 0.25f, //7X 21
+      0.50f, 0.25f, //7Y 22
+      0.50f, 0.25f, //7Z 23
+    };
+    textureBuffer.put(textureArray).position(0);
+
     short drawListArray[] =
     {
-      2, 5, 17, 2, 17, 14, //+Z check
-      3, 15, 9, 15, 21, 9, //+X check
+      2, 5, 17, 2, 17, 14, //+Z
+      3, 9, 21, 3, 21, 15, //+X
       11, 8, 20, 11, 20, 23, //-Z
       6, 0, 12, 6, 12, 18, //-X
       7, 10, 4, 7, 4, 1, //-Y
-      16, 22, 19, 16, 19, 13  //+Y
+      13, 16, 22, 13, 22, 19  //+Y
     };
     drawListBuffer.put(drawListArray).position(0);
   }
@@ -177,6 +219,7 @@ public class GLCube extends GLObject
     glBindAttribLocation(mProgram, 0, "aPosition");
     glBindAttribLocation(mProgram, 1, "aColor");
     glBindAttribLocation(mProgram, 2, "aNormal");
+    glBindAttribLocation(mProgram, 3, "aTexture");
 
     glLinkProgram(mProgram);
     glGetProgramiv(mProgram, GL_LINK_STATUS, IntBuffer.wrap(res));
@@ -190,23 +233,29 @@ public class GLCube extends GLObject
     int uNormalMatrixHandle;
     int uModelMatrixHandle;
     int uCameraMatrixHandle;
+    int uTextureColorHandle;
+    int uTextureSpecularHandle;
     int uCameraPositionHandle;
     int uLightPositionHandle;
     int uLightColorHandle;
+
     int aPositionHandle;
     int aColorHandle;
     int aNormalHandle;
+    int aTextureHandle;
     float[] mMVPMatrix = new float[16];
 
     aColorHandle = glGetAttribLocation(mProgram, "aColor");
     aPositionHandle = glGetAttribLocation(mProgram, "aPosition");
     aNormalHandle = glGetAttribLocation(mProgram, "aNormal");
+    aTextureHandle = glGetAttribLocation(mProgram, "aTexture");
 
     glUseProgram(mProgram);
 
     glEnableVertexAttribArray(aPositionHandle);
     glEnableVertexAttribArray(aColorHandle);
     glEnableVertexAttribArray(aNormalHandle);
+    glEnableVertexAttribArray(aTextureHandle);
 
     positionBuffer.position(0);
     glVertexAttribPointer(aPositionHandle, VALUES_PER_V_POSITION, GL_FLOAT, false, 0, positionBuffer);
@@ -219,6 +268,10 @@ public class GLCube extends GLObject
     normalBuffer.position(0);
     glVertexAttribPointer(aNormalHandle, VALUES_PER_V_NORMAL, GL_FLOAT, false, 0, normalBuffer);
     glEnableVertexAttribArray(aNormalHandle);
+
+    textureBuffer.position(0);
+    glVertexAttribPointer(aTextureHandle, VALUES_PER_V_TEXTURE, GL_FLOAT, false, 0, textureBuffer);
+    glEnableVertexAttribArray(aTextureHandle);
 
     Matrix.multiplyMM(mMVPMatrix, 0, mCameraMatrix, 0, mModelMatrix, 0);
     // get handle to shape's transformation matrix
@@ -233,6 +286,16 @@ public class GLCube extends GLObject
 
     uCameraMatrixHandle = glGetUniformLocation(mProgram, "uCameraMatrix");
     glUniformMatrix4fv(uCameraMatrixHandle, 1, false, mCameraMatrix, 0);
+
+    uTextureColorHandle = glGetUniformLocation(mProgram, "uTextureColor");
+    glActiveTexture(GLES20.GL_TEXTURE0 + 0);
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_COLOR)); // Bind the texture to this unit.
+    GLES20.glUniform1i(uTextureColorHandle, 0); // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
+
+    uTextureSpecularHandle = glGetUniformLocation(mProgram, "uTextureSpecular");
+    glActiveTexture(GLES20.GL_TEXTURE0 + 1);
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_SPECULAR));
+    GLES20.glUniform1i(uTextureSpecularHandle, 1);
 
     uCameraPositionHandle = glGetUniformLocation(mProgram, "uCameraPosition");
     uLightPositionHandle = glGetUniformLocation(mProgram, "uLightPosition");
@@ -254,5 +317,6 @@ public class GLCube extends GLObject
     glDisableVertexAttribArray(aPositionHandle);
     glDisableVertexAttribArray(aColorHandle);
     glDisableVertexAttribArray(aNormalHandle);
+    glDisableVertexAttribArray(aTextureHandle);
   }
 }

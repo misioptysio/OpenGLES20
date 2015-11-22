@@ -35,7 +35,7 @@ public class GLShaders
 
   private String[][] shaderCode = new String[100][2];
 
-  public GLShaders(Context context)
+  public GLShaders(final Context context)
   {
     shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_VERTEX] = VERTEX_SHADER_DEFAULT_CODE;
     shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_FRAGMENT] = FRAGMENT_SHADER_DEFAULT_CODE;

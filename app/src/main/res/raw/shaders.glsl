@@ -53,9 +53,11 @@
 	attribute vec4 aPosition;
 	attribute vec4 aColor;
 	attribute vec4 aNormal;
+	attribute vec2 aTexture;
 
-	varying vec3 vNormal;
 	varying vec4 vColor;
+	varying vec3 vNormal;
+	varying vec2 vTexture;
 	varying vec3 vCameraVector;
 	varying vec3 vLightVector[LIGHT_COUNT];
 
@@ -68,6 +70,7 @@
 
 		vNormal = mat3(uNormalMatrix) * aNormal.xyz;
 		vColor = aColor;
+		vTexture = aTexture;
 		vCameraVector = uCameraPosition - mPosition.xyz;
 
 		for (int i = 0; i < LIGHT_COUNT; i++)
@@ -80,14 +83,19 @@
 	precision mediump float;
 
 	uniform vec4 uLightColor[LIGHT_COUNT];
+	uniform sampler2D uTextureColor;
+	uniform sampler2D uTextureSpecular;
 
 	varying vec3 vCameraVector;
 	varying vec3 vLightVector[LIGHT_COUNT];
 
 	varying vec4 vColor;
 	varying vec3 vNormal;
+	varying vec2 vTexture;
 
 	float mSpecularDot;
+	vec4 mTextureColor;
+	vec4 mTextureSpecular;
 
 	void main()
 	{
@@ -109,12 +117,14 @@
 			vec3 mHalfAngle = normalize(cameraDir + lightDir);
 			mSpecularDot = dot(normalDir, mHalfAngle);
 
-			vec3 mReflected = 2.0 * normalDir * mDiffuseDot - lightDir;
+			//vec3 mReflected = 2.0 * normalDir * mDiffuseDot - lightDir;
 			//mSpecularDot = dot(cameraDir, mReflected);
 
-			specular += mSpecularColor * pow(clamp(mSpecularDot, 0.0, 1.0), 200.0);
+			specular += mSpecularColor * pow(clamp(mSpecularDot, 0.0, 1.0), 50.0);
 		}
 
-		gl_FragColor = clamp(vColor * diffuse + specular, 0.0, 1.0);
+		mTextureColor = texture2D(uTextureColor, vTexture);
+		mTextureSpecular = texture2D(uTextureSpecular, vTexture);
+		gl_FragColor = clamp(vColor * diffuse * mTextureColor + specular * mTextureSpecular, 0.0, 1.0);
 	}
 
