@@ -54,10 +54,14 @@
 	attribute vec4 aColor;
 	attribute vec4 aNormal;
 	attribute vec2 aTexture;
+	attribute vec4 aTangent;
+	attribute vec4 aCotangent;
 
 	varying vec4 vColor;
 	varying vec3 vNormal;
 	varying vec2 vTexture;
+	varying vec3 vTangent;
+	varying vec3 vCotangent;
 	varying vec3 vCameraVector;
 	varying vec3 vLightVector[LIGHT_COUNT];
 
@@ -71,6 +75,8 @@
 		vNormal = mat3(uNormalMatrix) * aNormal.xyz;
 		vColor = aColor;
 		vTexture = aTexture;
+		vTangent = mat3(uNormalMatrix) * aTangent.xyz;
+		vCotangent = mat3(uNormalMatrix) * aCotangent.xyz;
 		vCameraVector = uCameraPosition - mPosition.xyz;
 
 		for (int i = 0; i < LIGHT_COUNT; i++)
@@ -85,6 +91,7 @@
 	uniform vec4 uLightColor[LIGHT_COUNT];
 	uniform sampler2D uTextureColor;
 	uniform sampler2D uTextureSpecular;
+	uniform sampler2D uTextureNormal;
 
 	varying vec3 vCameraVector;
 	varying vec3 vLightVector[LIGHT_COUNT];
@@ -92,17 +99,21 @@
 	varying vec4 vColor;
 	varying vec3 vNormal;
 	varying vec2 vTexture;
+	varying vec3 vTangent;
+	varying vec3 vCotangent;
 
 	float mSpecularDot;
 	vec4 mTextureColor;
 	vec4 mTextureSpecular;
+	vec4 mTextureNormal;
 
 	void main()
 	{
 		vec4 diffuse = vec4(0.0, 0.0, 0.0, 1.0);
 		vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
-		vec3 normalDir = normalize(vNormal);
+		mTextureNormal = texture2D(uTextureNormal, vTexture);
+		vec3 normalDir = normalize(vNormal + (2.0*mTextureNormal.r-1.0) * vTangent + (2.0*mTextureNormal.g-1.0) * vCotangent);
 		vec3 cameraDir = normalize(vCameraVector);
 
 		for (int i = 0; i < LIGHT_COUNT; i++)

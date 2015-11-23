@@ -74,7 +74,7 @@ public abstract class GLObject
     glAttachShader(mProgram, mFragmentShader);
   }
 
-  public void createBuffer(int count, byte aType)
+  public FloatBuffer createBuffer(int count, byte aType)
   {
     int byteCount;
     FloatBuffer floatBuffer;
@@ -105,25 +105,7 @@ public abstract class GLObject
     floatBuffer = bb.asFloatBuffer();
     floatBuffer.position(0);
 
-    switch (aType)
-    {
-      case V_POSITION:
-        positionBuffer = floatBuffer;
-        break;
-
-      case V_NORMAL:
-        normalBuffer = floatBuffer;
-        break;
-
-      case V_COLOR:
-        colorBuffer = floatBuffer;
-        break;
-
-      case V_TEXTURE:
-      default:
-        textureBuffer = floatBuffer;
-        break;
-    }
+    return floatBuffer;
   }
 
   public void createDrawListBuffer(int drawListCount)

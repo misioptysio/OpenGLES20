@@ -51,9 +51,15 @@ Depth of field / blur:
 public class GLRenderer implements GLSurfaceView.Renderer
 {
 	private final Context mContext;
-	private final float[] mMVPMatrix = new float[16];
 	private final float[] mProjectionMatrix = new float[16];
 	private final float[] mViewMatrix = new float[16];
+
+	private float mAccelerationX;
+	private float mAccelerationY;
+	private int mAccelerationIndex = 0;
+	private float mAccelerationAngle = 0;
+	private float[][] mAcceleration = new float[10][2];
+
 	private boolean mFirstDraw;
 	private boolean mSurfaceCreated;
 	private int mWidth;
@@ -82,8 +88,8 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	{
 		float[] mPos1 = {0.0f, 8.0f, 4.0f};
 		float[] mPos2 = {0.0f, 0.0f, 4.0f};
-		float[] mPos3 = {-8.0f, 0.0f, 4.0f};
-		float[] mPos4 = {8.0f, 0.0f, 0.0f};
+		float[] mPos3 = {-8.0f, 0.0f, 2.0f};
+		float[] mPos4 = {8.0f, 0.0f, 4.0f};
 
 		float[] mCol1 = {1.0f, 1.0f, 1.0f, 1f};
 		float[] mCol2 = {0.2f, 0.2f, 0.2f, 1f};
@@ -136,6 +142,48 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		}
 	}
 
+	public void setGravityValues(float[] values)
+	{
+		float x = values[0];
+		float y = values[1];
+		float tmpX;
+		float tmpY;
+
+		if (x < 0.0f)
+		{
+			tmpX = Utils.mapValues(x, -0.5f, -6.0f,  0.0f, 1.0f, Utils.INTERPOLATE_CUBIC);
+		}
+		else
+		{
+			tmpX = Utils.mapValues(x, 0.5f, 6.0f,  0.0f, -1.0f, Utils.INTERPOLATE_CUBIC);
+		}
+
+		if (y < 0.0f)
+		{
+			tmpY = Utils.mapValues(y, -0.1f, -6.0f,  0.0f, 1.0f, Utils.INTERPOLATE_CUBIC_SQUARED);
+		}
+		else
+		{
+			tmpY = Utils.mapValues(y, 0.1f, 6.0f,  0.0f, -1.0f, Utils.INTERPOLATE_CUBIC_SQUARED);
+		}
+
+		mAccelerationIndex++;
+		if (mAccelerationIndex == mAcceleration.length)
+			mAccelerationIndex = 0;
+		mAcceleration[mAccelerationIndex][0] = tmpX;
+		mAcceleration[mAccelerationIndex][1] = tmpY;
+
+		tmpX = 0.0f;
+		tmpY = 0.0f;
+		for (int i = 0; i < mAcceleration.length; i++)
+		{
+			tmpX += mAcceleration[i][0];
+			tmpY += mAcceleration[i][1];
+		}
+		mAccelerationX = tmpX / mAcceleration.length;
+		mAccelerationY = tmpY / mAcceleration.length;
+	}
+
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
@@ -186,6 +234,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 //				Utils.log("FPS " + mFPS);
 				mFPS = 0;
 				mLastTime = currentTime;
+				Utils.log("Acceleration: " + String.format("[x: %2.4f, y: %2.4f]", mAccelerationX, mAccelerationY));
 			}
 		}
 
@@ -206,8 +255,13 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		// Set the camera position (View matrix)
 		setLookAt(mViewMatrix, mGlobals.cameraPosition, mGlobals.cameraLookAt, mGlobals.cameraUp);
 
-		mCube.setRotation((float) Math.sin(time) * 30.0f, 1.0f, 0.0f, 0.0f, false);
-		mCube.setRotation(time * 50.4773f, 0.0f, 1.0f, 0.0f, true);
+//		mCube.setRotation((float) Math.sin(time) * 30.0f, 1.0f, 0.0f, 0.0f, false);
+//		mCube.setRotation(time * 50.4773f, 0.0f, 1.0f, 0.0f, true);
+
+		mAccelerationAngle += mAccelerationX * 2.5f;
+//		mAccelerationAngle = Math.max(-50.0f, Math.min(50.0f, mAccelerationAngle));
+		mCube.setRotation(-mAccelerationY * 70.0f, 1.0f, 0.0f, 0.0f, false);
+		mCube.setRotation(mAccelerationAngle, 0.0f, 1.0f, 0.0f, true);
 		mCube.setScale(1.3f, 1.3f, 1.3f);
 		//mCube.setTranslation((float) Math.cos(0.028f * angle), (float) Math.sin(0.023f * angle), 0.0f);
 

@@ -3,6 +3,7 @@ package com.games;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static android.opengl.GLES20.GL_FLOAT;
@@ -38,13 +39,18 @@ import static com.games.Const.V_TEXTURE;
  */
 public class GLCube extends GLObject
 {
+  protected FloatBuffer tangentBuffer;
+  protected FloatBuffer cotangentBuffer;
+
   public GLCube()
   {
     vertexCount = 24;
-    createBuffer(vertexCount, V_POSITION);
-    createBuffer(vertexCount, V_COLOR);
-    createBuffer(vertexCount, V_NORMAL);
-    createBuffer(vertexCount, V_TEXTURE);
+    positionBuffer = createBuffer(vertexCount, V_POSITION);
+    colorBuffer = createBuffer(vertexCount, V_COLOR);
+    normalBuffer = createBuffer(vertexCount, V_NORMAL);
+    textureBuffer = createBuffer(vertexCount, V_TEXTURE);
+    tangentBuffer = createBuffer(vertexCount, V_NORMAL);
+    cotangentBuffer = createBuffer(vertexCount, V_NORMAL);
 
     createDrawListBuffer(36);
 
@@ -117,6 +123,76 @@ public class GLCube extends GLObject
       0.0f, 0.0f, -1.0f, //7Z 23
     };
     normalBuffer.put(normalArray).position(0);
+
+    float[] tangentArray = {
+      0.0f, 1.0f, 0.0f, //0X 00
+      -1.0f, 0.0f, 0.0f, //0Y 01
+      1.0f, 0.0f, 0.0f, //0Z 02
+
+      0.0f, -1.0f, 0.0f, //1X 03
+      -1.0f, 0.0f, 0.0f, //1Y 04
+      1.0f, 0.0f, 0.0f, //1Z 05
+
+      0.0f, 1.0f, 0.0f, //2X 06
+      -1.0f, 0.0f, 0.0f, //2Y 07
+      1.0f, 0.0f, 0.0f, //2Z 08
+
+      0.0f, -1.0f, 0.0f, //3X 09
+      -1.0f, 0.0f, 0.0f, //3Y 10
+      1.0f, 0.0f, 0.0f, //3Z 11
+
+      0.0f, 1.0f, 0.0f, //4X 12
+      1.0f, 0.0f, 0.0f, //4Y 13
+      1.0f, 0.0f, 0.0f, //4Z 14
+
+      0.0f, -1.0f, 0.0f, //5X 15
+      1.0f, 0.0f, 0.0f, //5Y 16
+      1.0f, 0.0f, 0.0f, //5Z 17
+
+      0.0f, 1.0f, 0.0f, //6X 18
+      1.0f, 0.0f, 0.0f, //6Y 19
+      1.0f, 0.0f, 0.0f, //6Z 20
+
+      0.0f, -1.0f, 0.0f, //7X 21
+      1.0f, 0.0f, 0.0f, //7Y 22
+      1.0f, 0.0f, 0.0f, //7Z 23
+    };
+    tangentBuffer.put(tangentArray).position(0);
+
+    float[] cotangentArray = {
+      0.0f, 0.0f, 1.0f, //0X 00
+      0.0f, 0.0f, 1.0f, //0Y 01
+      0.0f, -1.0f, 0.0f, //0Z 02
+
+      0.0f, 0.0f, 1.0f, //1X 03
+      0.0f, 0.0f, 1.0f, //1Y 04
+      0.0f, -1.0f, 0.0f, //1Z 05
+
+      0.0f, 0.0f, 1.0f, //2X 06
+      0.0f, 0.0f, 1.0f, //2Y 07
+      0.0f, 1.0f, 0.0f, //2Z 08
+
+      0.0f, 0.0f, 1.0f, //3X 09
+      0.0f, 0.0f, 1.0f, //3Y 10
+      0.0f, 1.0f, 0.0f, //3Z 11
+
+      0.0f, 0.0f, 1.0f, //4X 12
+      0.0f, 0.0f, -1.0f, //4Y 13
+      0.0f, -1.0f, 0.0f, //4Z 14
+
+      0.0f, 0.0f, 1.0f, //5X 15
+      0.0f, 0.0f, -1.0f, //5Y 16
+      0.0f, -1.0f, 0.0f, //5Z 17
+
+      0.0f, 0.0f, 1.0f, //6X 18
+      0.0f, 0.0f, -1.0f, //6Y 19
+      0.0f, 1.0f, 0.0f, //6Z 20
+
+      0.0f, 0.0f, 1.0f, //7X 21
+      0.0f, 0.0f, -1.0f, //7Y 22
+      0.0f, 1.0f, 0.0f, //7Z 23
+    };
+    cotangentBuffer.put(cotangentArray).position(0);
 
     float[] colorArray = {
       0.0f, 0.0f, 1.0f, 1.0f, //B
@@ -220,6 +296,8 @@ public class GLCube extends GLObject
     glBindAttribLocation(mProgram, 1, "aColor");
     glBindAttribLocation(mProgram, 2, "aNormal");
     glBindAttribLocation(mProgram, 3, "aTexture");
+    glBindAttribLocation(mProgram, 4, "aTangent");
+    glBindAttribLocation(mProgram, 5, "aCotangent");
 
     glLinkProgram(mProgram);
     glGetProgramiv(mProgram, GL_LINK_STATUS, IntBuffer.wrap(res));
@@ -235,6 +313,7 @@ public class GLCube extends GLObject
     int uCameraMatrixHandle;
     int uTextureColorHandle;
     int uTextureSpecularHandle;
+    int uTextureNormalHandle;
     int uCameraPositionHandle;
     int uLightPositionHandle;
     int uLightColorHandle;
@@ -243,12 +322,16 @@ public class GLCube extends GLObject
     int aColorHandle;
     int aNormalHandle;
     int aTextureHandle;
+    int aTangentHandle;
+    int aCotangentHandle;
     float[] mMVPMatrix = new float[16];
 
     aColorHandle = glGetAttribLocation(mProgram, "aColor");
     aPositionHandle = glGetAttribLocation(mProgram, "aPosition");
     aNormalHandle = glGetAttribLocation(mProgram, "aNormal");
     aTextureHandle = glGetAttribLocation(mProgram, "aTexture");
+    aTangentHandle = glGetAttribLocation(mProgram, "aTangent");
+    aCotangentHandle = glGetAttribLocation(mProgram, "aCotangent");
 
     glUseProgram(mProgram);
 
@@ -256,6 +339,8 @@ public class GLCube extends GLObject
     glEnableVertexAttribArray(aColorHandle);
     glEnableVertexAttribArray(aNormalHandle);
     glEnableVertexAttribArray(aTextureHandle);
+    glEnableVertexAttribArray(aTangentHandle);
+    glEnableVertexAttribArray(aCotangentHandle);
 
     positionBuffer.position(0);
     glVertexAttribPointer(aPositionHandle, VALUES_PER_V_POSITION, GL_FLOAT, false, 0, positionBuffer);
@@ -272,6 +357,14 @@ public class GLCube extends GLObject
     textureBuffer.position(0);
     glVertexAttribPointer(aTextureHandle, VALUES_PER_V_TEXTURE, GL_FLOAT, false, 0, textureBuffer);
     glEnableVertexAttribArray(aTextureHandle);
+
+    tangentBuffer.position(0);
+    glVertexAttribPointer(aTangentHandle, VALUES_PER_V_NORMAL, GL_FLOAT, false, 0, tangentBuffer);
+    glEnableVertexAttribArray(aTangentHandle);
+
+    cotangentBuffer.position(0);
+    glVertexAttribPointer(aCotangentHandle, VALUES_PER_V_NORMAL, GL_FLOAT, false, 0, cotangentBuffer);
+    glEnableVertexAttribArray(aCotangentHandle);
 
     Matrix.multiplyMM(mMVPMatrix, 0, mCameraMatrix, 0, mModelMatrix, 0);
     // get handle to shape's transformation matrix
@@ -297,6 +390,11 @@ public class GLCube extends GLObject
     GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_SPECULAR));
     GLES20.glUniform1i(uTextureSpecularHandle, 1);
 
+    uTextureNormalHandle = glGetUniformLocation(mProgram, "uTextureNormal");
+    glActiveTexture(GLES20.GL_TEXTURE0 + 2);
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_NORMAL));
+    GLES20.glUniform1i(uTextureNormalHandle, 2);
+
     uCameraPositionHandle = glGetUniformLocation(mProgram, "uCameraPosition");
     uLightPositionHandle = glGetUniformLocation(mProgram, "uLightPosition");
     uLightColorHandle = glGetUniformLocation(mProgram, "uLightColor");
@@ -318,5 +416,7 @@ public class GLCube extends GLObject
     glDisableVertexAttribArray(aColorHandle);
     glDisableVertexAttribArray(aNormalHandle);
     glDisableVertexAttribArray(aTextureHandle);
+    glDisableVertexAttribArray(aTangentHandle);
+    glDisableVertexAttribArray(aCotangentHandle);
   }
 }

@@ -27,6 +27,7 @@ public class GLTextures
 	{
 		mTextureHandles[TEXTURE_COLOR] = loadTexture(context, R.raw.texture_color);
 		mTextureHandles[TEXTURE_SPECULAR] = loadTexture(context, R.raw.texture_specular);
+		mTextureHandles[TEXTURE_NORMAL] = loadTexture(context, R.raw.texture_normal);
 	}
 
 	public int getTextureHandle(int index)

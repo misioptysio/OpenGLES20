@@ -3,18 +3,24 @@ package com.games;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ConfigurationInfo;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class GLActivity extends Activity
+public class GLActivity extends Activity implements SensorEventListener
 {
   private GLSurfaceView mGLView;
   private GLRenderer mRenderer;
-  private Globals mGlobals;
+  private SensorManager sensorManager;
+  private long timeLastUpdate;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -40,6 +46,9 @@ public class GLActivity extends Activity
     }
 
     setContentView(mGLView);
+    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+    timeLastUpdate = 0;
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
   }
 
   private boolean hasGLES20()
@@ -57,6 +66,8 @@ public class GLActivity extends Activity
     {
       mGLView.onResume();
     }
+
+    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
   }
 
   @Override
@@ -67,6 +78,7 @@ public class GLActivity extends Activity
     {
       mGLView.onPause();
     }
+    sensorManager.unregisterListener(this);
   }
 
   @Override
@@ -74,5 +86,31 @@ public class GLActivity extends Activity
   {
 //    Utils.log("Event " + ev.toString());
     return super.dispatchTouchEvent(ev);
+  }
+
+  @Override
+  public void onSensorChanged(SensorEvent event)
+  {
+    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+    {
+      getAccelerometer(event);
+    }
+  }
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int accuracy)
+  {
+
+  }
+
+  private void getAccelerometer(SensorEvent event)
+  {
+    long timeThisUpdate = event.timestamp;
+    if ((timeThisUpdate - timeLastUpdate < 200) && (timeLastUpdate != 0))
+    {
+      return;
+    }
+    timeLastUpdate = timeThisUpdate;
+    mRenderer.setGravityValues(event.values);
   }
 }
