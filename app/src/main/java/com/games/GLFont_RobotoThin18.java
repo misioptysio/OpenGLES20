@@ -3,7 +3,7 @@ package com.games;
 import com.games.GLFont;
 	
 /**
- * Created by Ptysio on 2015-11-25 12:58.
+ * Created by Ptysio on 2015-11-25 15:08.
  */
 public final class GLFont_RobotoThin18 extends GLFont
 {
@@ -17,7 +17,7 @@ public final class GLFont_RobotoThin18 extends GLFont
 	public static final String FONT_NAME = "Roboto-Thin.ttf";
 	
 	//file name with the texture
-	public static final String FONT_TEXTURE_NAME = "robotothin18";
+	public static final String FONT_TEXTURE_NAME = "font_robotothin18";
 	
 	//font size used to generate the class (in pixels)
 	public static final int FONT_SIZE = 18;

@@ -25,7 +25,7 @@ public class GLTextures
 
 	public GLTextures()
 	{
-		Context context = OpenGLApplication.getContext();
+		Context context = GLApplication.getContext();
 
 		mTextureHandles[TEXTURE_COLOR] = loadTexture(context, R.raw.texture_color);
 		mTextureHandles[TEXTURE_SPECULAR] = loadTexture(context, R.raw.texture_specular);

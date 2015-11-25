@@ -71,7 +71,7 @@
 	$line_height = $dim[3] - $dim[1] + $CORR_LINE_HEIGHT;
 
 	$class_name = "GLFont_".(str_replace('-', '', $FONT_NAME))."$FONT_SIZE";
-	$file_name = strtolower("".(str_replace('-', '', $FONT_NAME))."$FONT_SIZE");
+	$file_name = strtolower("font_".(str_replace('-', '', $FONT_NAME))."$FONT_SIZE");
 	
 	$indices_arr = array();
 	$sizes_arr = array();

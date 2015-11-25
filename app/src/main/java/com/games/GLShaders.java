@@ -1,7 +1,6 @@
 package com.games;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.opengl.GLES20;
 
 import java.io.BufferedReader;
@@ -41,7 +40,7 @@ public class GLShaders
     shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_FRAGMENT] = FRAGMENT_SHADER_DEFAULT_CODE;
 
     //read shaders.glsl
-    readShaders(OpenGLApplication.getContext(), R.raw.shaders);
+    readShaders(GLApplication.getContext(), R.raw.shaders);
   }
 
   public int findShaderNameID(String name)

@@ -109,7 +109,7 @@
 
 	void main()
 	{
-		vec4 diffuse = vec4(0.0, 0.0, 0.0, 1.0);
+		vec4 diffuse = vec4(0.0, 0.0, 0.0, 0.0);
 		vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
 		mTextureNormal = texture2D(uTextureNormal, vTexture);

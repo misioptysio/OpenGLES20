@@ -6,12 +6,12 @@ import android.content.Context;
 /**
  * Created by piotr.plys on 2015-11-25.
  */
-public class OpenGLApplication extends Application
+public class GLApplication extends Application
 {
-  private static OpenGLApplication sInstance;
+  private static GLApplication sInstance;
   private static Globals sGlobals;
 
-  public OpenGLApplication()
+  public GLApplication()
   {
     sInstance = this;
   }

@@ -42,6 +42,9 @@ Depth of field / blur:
 		http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
 		http://encelo.netsons.org/2008/03/23/i-love-depth-of-field/
 
+Perlin noise
+		http://mrl.nyu.edu/~perlin/noise/
+
 */
 
 /**
@@ -190,7 +193,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mWidth = -1;
 		mHeight = -1;
 
-		mGlobals = OpenGLApplication.initSGlobals();
+		mGlobals = GLApplication.initSGlobals();
 	}
 
 	@Override
