@@ -62,8 +62,11 @@ public abstract class GLObject
 
   public void initShaders(int shaderID)
   {
-    mVertexShader = mGlobals.glShaders.loadShader(GL_VERTEX_SHADER, mGlobals.getVertexShader(shaderID));
-    mFragmentShader = mGlobals.glShaders.loadShader(GL_FRAGMENT_SHADER, mGlobals.getFragmentShader(shaderID));
+    GLShaders glShaders;
+
+    glShaders = mGlobals.getGlShaders();
+    mVertexShader = glShaders.loadShader(GL_VERTEX_SHADER, mGlobals.getVertexShader(shaderID));
+    mFragmentShader = glShaders.loadShader(GL_FRAGMENT_SHADER, mGlobals.getFragmentShader(shaderID));
   }
 
   public void initProgram()

@@ -23,8 +23,10 @@ public class GLTextures
 	public final static int[] mTextureHandles = new int[TEXTURE_MAX];
 	static GL10 gl;
 
-	public GLTextures(final Context context)
+	public GLTextures()
 	{
+		Context context = OpenGLApplication.getContext();
+
 		mTextureHandles[TEXTURE_COLOR] = loadTexture(context, R.raw.texture_color);
 		mTextureHandles[TEXTURE_SPECULAR] = loadTexture(context, R.raw.texture_specular);
 		mTextureHandles[TEXTURE_NORMAL] = loadTexture(context, R.raw.texture_normal);

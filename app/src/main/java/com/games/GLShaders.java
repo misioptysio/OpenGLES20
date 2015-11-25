@@ -35,13 +35,13 @@ public class GLShaders
 
   private String[][] shaderCode = new String[100][2];
 
-  public GLShaders(final Context context)
+  public GLShaders()
   {
     shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_VERTEX] = VERTEX_SHADER_DEFAULT_CODE;
     shaderCode[SHADER_NAME_DEFAULT][SHADER_TYPE_FRAGMENT] = FRAGMENT_SHADER_DEFAULT_CODE;
 
     //read shaders.glsl
-    readShaders(context, R.raw.shaders);
+    readShaders(OpenGLApplication.getContext(), R.raw.shaders);
   }
 
   public int findShaderNameID(String name)

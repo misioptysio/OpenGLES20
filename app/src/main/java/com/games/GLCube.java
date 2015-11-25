@@ -287,8 +287,9 @@ public class GLCube extends GLObject
   public void init()
   {
     int[] res = new int[16];
+    GLShaders glShaders = mGlobals.getGlShaders();
 
-    initShaders(mGlobals.glShaders.SHADER_NAME_PHONG);
+    initShaders(glShaders.SHADER_NAME_PHONG);
     initProgram();
 
     // Bind attributes
@@ -325,6 +326,9 @@ public class GLCube extends GLObject
     int aTangentHandle;
     int aCotangentHandle;
     float[] mMVPMatrix = new float[16];
+
+    GLTextures glTextures = mGlobals.getGlTextures();
+    GLLights glLights = mGlobals.getGlLights();
 
     aColorHandle = glGetAttribLocation(mProgram, "aColor");
     aPositionHandle = glGetAttribLocation(mProgram, "aPosition");
@@ -382,17 +386,17 @@ public class GLCube extends GLObject
 
     uTextureColorHandle = glGetUniformLocation(mProgram, "uTextureColor");
     glActiveTexture(GLES20.GL_TEXTURE0 + 0);
-    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_COLOR)); // Bind the texture to this unit.
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures.getTextureHandle(GLTextures.TEXTURE_COLOR)); // Bind the texture to this unit.
     GLES20.glUniform1i(uTextureColorHandle, 0); // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
 
     uTextureSpecularHandle = glGetUniformLocation(mProgram, "uTextureSpecular");
     glActiveTexture(GLES20.GL_TEXTURE0 + 1);
-    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_SPECULAR));
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures.getTextureHandle(GLTextures.TEXTURE_SPECULAR));
     GLES20.glUniform1i(uTextureSpecularHandle, 1);
 
     uTextureNormalHandle = glGetUniformLocation(mProgram, "uTextureNormal");
     glActiveTexture(GLES20.GL_TEXTURE0 + 2);
-    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mGlobals.glTextures.getTextureHandle(GLTextures.TEXTURE_NORMAL));
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextures.getTextureHandle(GLTextures.TEXTURE_NORMAL));
     GLES20.glUniform1i(uTextureNormalHandle, 2);
 
     uCameraPositionHandle = glGetUniformLocation(mProgram, "uCameraPosition");
@@ -400,13 +404,13 @@ public class GLCube extends GLObject
     uLightColorHandle = glGetUniformLocation(mProgram, "uLightColor");
 
 		if (uCameraPositionHandle != -1)
-			glUniform3fv(uCameraPositionHandle, 1, mGlobals.cameraPosition, 0);
+			glUniform3fv(uCameraPositionHandle, 1, mGlobals.getCameraPosition(), 0);
 
 		if (uLightPositionHandle != -1)
-			glUniform3fv(uLightPositionHandle, mGlobals.glLights.mLightCount, mGlobals.glLights.mLightPosition, 0);
+			glUniform3fv(uLightPositionHandle, glLights.mLightCount, glLights.mLightPosition, 0);
 
 		if (uLightColorHandle != -1)
-			glUniform4fv(uLightColorHandle, mGlobals.glLights.mLightCount, mGlobals.glLights.mLightColor, 0);
+			glUniform4fv(uLightColorHandle, glLights.mLightCount, glLights.mLightColor, 0);
 
 		// Draw the cube
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, drawListBuffer);

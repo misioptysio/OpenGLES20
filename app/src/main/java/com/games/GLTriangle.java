@@ -44,7 +44,7 @@ public class GLTriangle extends GLObject
 	@Override
 	public void init()
 	{
-		initShaders(mGlobals.glShaders.SHADER_NAME_MATRIX);
+		initShaders(mGlobals.getGlShaders().SHADER_NAME_MATRIX);
 		initProgram();
 
 		// Bind attributes

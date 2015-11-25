@@ -1,25 +1,23 @@
 package com.games;
 
-import android.content.Context;
-
 /**
  * Created by Ptysio on 2015-11-15.
  */
-public class Globals
+public final class Globals
 {
-  public GLLights glLights;
-  public GLShaders glShaders;
-  public GLTextures glTextures;
+  private final GLLights glLights;
+  private final GLShaders glShaders;
+  private final GLTextures glTextures;
 
-  public float[] cameraPosition = new float[3];
-  public float[] cameraLookAt = new float[3];
-  public float[] cameraUp = new float[3];
+  private float[] cameraPosition = new float[3];
+  private float[] cameraLookAt = new float[3];
+  private float[] cameraUp = new float[3];
 
-  public Globals(Context context)
+  public Globals()
   {
     glLights = new GLLights();
-    glShaders = new GLShaders(context);
-    glTextures = new GLTextures(context);
+    glShaders = new GLShaders();
+    glTextures = new GLTextures();
 
     cameraPosition = new float[]{0.0f, 0.0f, 10.0f};
     cameraLookAt = new float[]{0.0f, 0.0f, 0.0f};
@@ -40,5 +38,50 @@ public class Globals
     res = "const int LIGHT_COUNT = " + glLights.mLightCount + "; " + res;
 
     return res;
+  }
+
+  public float[] getCameraPosition()
+  {
+    return cameraPosition;
+  }
+
+  public float[] getCameraLookAt()
+  {
+    return cameraLookAt;
+  }
+
+  public GLLights getGlLights()
+  {
+    return glLights;
+  }
+
+  public GLShaders getGlShaders()
+  {
+    return glShaders;
+  }
+
+  public GLTextures getGlTextures()
+  {
+    return glTextures;
+  }
+
+  public float[] getCameraUp()
+  {
+    return cameraUp;
+  }
+
+  public void setCameraPosition(float[] cameraPosition)
+  {
+    this.cameraPosition = cameraPosition;
+  }
+
+  public void setCameraLookAt(float[] cameraLookAt)
+  {
+    this.cameraLookAt = cameraLookAt;
+  }
+
+  public void setCameraUp(float[] cameraUp)
+  {
+    this.cameraUp = cameraUp;
   }
 }

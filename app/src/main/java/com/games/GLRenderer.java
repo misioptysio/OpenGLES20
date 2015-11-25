@@ -1,6 +1,5 @@
 package com.games;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -50,7 +49,6 @@ Depth of field / blur:
  */
 public class GLRenderer implements GLSurfaceView.Renderer
 {
-	private final Context mContext;
 	private final float[] mProjectionMatrix = new float[16];
 	private final float[] mViewMatrix = new float[16];
 
@@ -71,10 +69,8 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	private GLCube mCube;
 	private Globals mGlobals;
 
-	public GLRenderer(final Context context)
+	public GLRenderer()
 	{
-		mContext = context;
-
 		mFirstDraw = true;
 		mSurfaceCreated = false;
 		mWidth = -1;
@@ -96,14 +92,15 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		float[] mCol3 = {0.4f, 0.2f, 0.2f, 1f};
 		float[] mCol4 = {1.0f, 1.0f, 1.0f, 1f};
 
-		mGlobals.glLights.addLight(mPos1, mCol1);
-		mGlobals.glLights.addLight(mPos2, mCol2);
-		mGlobals.glLights.addLight(mPos3, mCol3);
-		mGlobals.glLights.addLight(mPos4, mCol4);
+		GLLights glLights = mGlobals.getGlLights();
+		glLights.addLight(mPos1, mCol1);
+		glLights.addLight(mPos2, mCol2);
+		glLights.addLight(mPos3, mCol3);
+		glLights.addLight(mPos4, mCol4);
 
-		mGlobals.cameraPosition = new float[] {0.0f, 0.0f, 5.0f};
-		mGlobals.cameraLookAt = new float[] {0.0f, 0.0f, 0.0f};
-		mGlobals.cameraUp = new float[] {0.0f, 1.0f, 0.0f};
+		mGlobals.setCameraPosition(new float[]{0.0f, 0.0f, 5.0f});
+		mGlobals.setCameraLookAt(new float[]{0.0f, 0.0f, 0.0f});
+		mGlobals.setCameraUp(new float[]{0.0f, 1.0f, 0.0f});
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		// Enable depth test
@@ -193,7 +190,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mWidth = -1;
 		mHeight = -1;
 
-		mGlobals = new Globals(mContext);
+		mGlobals = OpenGLApplication.initSGlobals();
 	}
 
 	@Override
@@ -234,7 +231,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 //				Utils.log("FPS " + mFPS);
 				mFPS = 0;
 				mLastTime = currentTime;
-				Utils.log("Acceleration: " + String.format("[x: %2.4f, y: %2.4f]", mAccelerationX, mAccelerationY));
+//				Utils.log("Acceleration: " + String.format("[x: %2.4f, y: %2.4f]", mAccelerationX, mAccelerationY));
 			}
 		}
 
@@ -253,7 +250,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		float time = (System.currentTimeMillis() - mStartTime) * 0.001f;
 
 		// Set the camera position (View matrix)
-		setLookAt(mViewMatrix, mGlobals.cameraPosition, mGlobals.cameraLookAt, mGlobals.cameraUp);
+		setLookAt(mViewMatrix, mGlobals.getCameraPosition(), mGlobals.getCameraLookAt(), mGlobals.getCameraUp());
 
 //		mCube.setRotation((float) Math.sin(time) * 30.0f, 1.0f, 0.0f, 0.0f, false);
 //		mCube.setRotation(time * 50.4773f, 0.0f, 1.0f, 0.0f, true);

@@ -21,11 +21,19 @@ public class GLActivity extends Activity implements SensorEventListener
   private GLRenderer mRenderer;
   private SensorManager sensorManager;
   private long timeLastUpdate;
+  private GLFont testFont1 = new GLFont();
+  private GLFont_RobotoThin18 testFont2 = new GLFont_RobotoThin18();
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
+
+    Utils.log("GLFont min char %d", testFont1.FONT_MIN_INDEX);
+    Utils.log("GLFont_RobotoThin18 min char %d", testFont2.FONT_MIN_INDEX);
+
+    Utils.log("GLFont min char %d", testFont1.getFontMinIndex());
+    Utils.log("GLFont_RobotoThin18 min char %d", testFont2.getFontMinIndex());
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -36,7 +44,7 @@ public class GLActivity extends Activity implements SensorEventListener
       mGLView.setEGLContextClientVersion(2);
       mGLView.setPreserveEGLContextOnPause(true);
 
-      mRenderer = new GLRenderer(this);
+      mRenderer = new GLRenderer();
       mGLView.setRenderer(mRenderer);
 //      mGLView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
