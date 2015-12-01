@@ -146,8 +146,8 @@ public class GLRenderer implements GLSurfaceView.Renderer
 	{
 		float x = values[0];
 		float y = values[1];
-		float tmpX;
-		float tmpY;
+		double tmpX;
+		double tmpY;
 
 		if (x < 0.0f)
 		{
@@ -160,28 +160,28 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
 		if (y < 0.0f)
 		{
-			tmpY = Utils.mapValues(y, -0.1f, -6.0f,  0.0f, 1.0f, Utils.INTERPOLATE_CUBIC_SQUARED);
+			tmpY = Utils.mapValues(y, -0.1f, -6.0f,  0.0f, 1.0f, Utils.INTERPOLATE_CUBIC);
 		}
 		else
 		{
-			tmpY = Utils.mapValues(y, 0.1f, 6.0f,  0.0f, -1.0f, Utils.INTERPOLATE_CUBIC_SQUARED);
+			tmpY = Utils.mapValues(y, 0.1f, 6.0f,  0.0f, -1.0f, Utils.INTERPOLATE_CUBIC);
 		}
 
 		mAccelerationIndex++;
 		if (mAccelerationIndex == mAcceleration.length)
 			mAccelerationIndex = 0;
-		mAcceleration[mAccelerationIndex][0] = tmpX;
-		mAcceleration[mAccelerationIndex][1] = tmpY;
+		mAcceleration[mAccelerationIndex][0] = (float) tmpX;
+		mAcceleration[mAccelerationIndex][1] = (float) tmpY;
 
-		tmpX = 0.0f;
-		tmpY = 0.0f;
+		tmpX = 0.0;
+		tmpY = 0.0;
 		for (int i = 0; i < mAcceleration.length; i++)
 		{
 			tmpX += mAcceleration[i][0];
 			tmpY += mAcceleration[i][1];
 		}
-		mAccelerationX = tmpX / mAcceleration.length;
-		mAccelerationY = tmpY / mAcceleration.length;
+		mAccelerationX = (float) tmpX / mAcceleration.length;
+		mAccelerationY = (float) tmpY / mAcceleration.length;
 	}
 
 	@Override

@@ -13,7 +13,7 @@ public final class Utils
   public static final int INTERPOLATE_CUBIC = 2;
   public static final int INTERPOLATE_ROOT = 3;
   public static final int INTERPOLATE_INV_QUADRATIC = 4;
-  public static final int INTERPOLATE_CUBIC_SQUARED = 5;
+  public static final int INTERPOLATE_PERLIN = 5;
 
   public static final boolean DEBUG = true;
   public static final String LOG_TAG = "[PTYSIO]";
@@ -34,30 +34,34 @@ public final class Utils
     }
   }
 
-  //input x = <0, 1>, output <0, 1>
-  public static float interpolationFunction(float t, int type)
+  public static double interpolationFunctionPerlin(double t)
   {
-    float res;
+    return (t * t * t * (t * (t * 6 - 15) + 10));
+  }
 
-    if (t <= 0.0f)
+  //input x = <0, 1>, output <0, 1>
+  public static double interpolationFunction(double t, int type)
+  {
+    double res;
+
+    if (t <= 0.0)
     {
-      res = 0.0f;
+      res = 0.0;
     }
-    else if (t >= 1.0f)
+    else if (t >= 1.0)
     {
-      res = 1.0f;
+      res = 1.0;
     }
     else
     {
       switch (type)
       {
         case INTERPOLATE_CUBIC:
-          res = (3.0f - 2.0f * t) * t * t;
+          res = (3.0 - 2.0 * t) * t * t;
           break;
 
-        case INTERPOLATE_CUBIC_SQUARED:
-          float tmp = interpolationFunction(t, INTERPOLATE_CUBIC);
-          res = tmp * tmp;
+        case INTERPOLATE_PERLIN:
+          res = interpolationFunctionPerlin(t);
           break;
 
         case INTERPOLATE_QUADRATIC:
@@ -81,20 +85,29 @@ public final class Utils
     return res;
   }
 
-  public static float interpolateValues(float x1, float x2, float t, int type)
+  public static double interpolateValues(double x1, double x2, double t, int type)
   {
-    float res;
+    double res;
 
     res = x1 + (x2 - x1) * interpolationFunction(t, type);
 
     return res;
   }
 
-  //interpolates value x from range <xMin, xMax> and maps it to range <vMin, vMax> using type interpolation
-  public static float mapValues(float x, float xMin, float xMax, float vMin, float vMax, int type)
+  public static double interpolateValues(double x1, double x2, double t)
   {
-    float res;
-    float xInterpolated;
+    double res;
+
+    res = x1 + (x2 - x1) * t;
+
+    return res;
+  }
+
+  //interpolates value x from range <xMin, xMax> and maps it to range <vMin, vMax> using type interpolation
+  public static double mapValues(double x, double xMin, double xMax, double vMin, double vMax, int type)
+  {
+    double res;
+    double xInterpolated;
 
     xInterpolated = interpolateValues(xMin, xMax, (x - xMin) / (xMax - xMin), INTERPOLATE_LINEAR);
     res = interpolateValues(vMin, vMax, (xInterpolated - xMin) / (xMax - xMin), type);
