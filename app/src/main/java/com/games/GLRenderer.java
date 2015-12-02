@@ -81,6 +81,26 @@ public class GLRenderer implements GLSurfaceView.Renderer
 		mStartTime = System.currentTimeMillis();
 		mLastTime = mStartTime;
 		mFPS = 0;
+
+		GLRandom r = new GLRandom(0);
+
+		float res;
+		for (int i=0; i<10; i++)
+		{
+			res = r.nextInt(10);
+			Utils.log("Random value: %02.4f", res);
+
+			if (i == 7)
+			{
+				r.pushSeed(0);
+				for (int j=0; j<5; j++)
+				{
+					res = r.nextInt(10);
+					Utils.log("Random value: %02.4f", res);
+				}
+				r.popSeed();
+			}
+		};
 	}
 
 	public void initOnce()
@@ -273,7 +293,7 @@ public class GLRenderer implements GLSurfaceView.Renderer
 }
 
 // TODO: 2015-11-20 Materials with ambient, specular, diffuse
-// TODO: 2015-11-20 Bumpmapping
 // TODO: 2015-11-20 Transparency
 // TODO: 2015-11-20 Perlin noise implementation
+// TODO: 2015-11-28 Game logic :)
 
