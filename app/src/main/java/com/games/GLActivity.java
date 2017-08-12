@@ -30,7 +30,7 @@ public class GLActivity extends Activity implements SensorEventListener
     super.onCreate(savedInstanceState);
 
     Utils.log("GLFont min char %d", testFont1.FONT_MIN_INDEX);
-    Utils.log("GLFont_RobotoThin18 min char %d", testFont2.FONT_MIN_INDEX);
+    //Utils.log("GLFont_RobotoThin18 min char %d", testFont2.FONT_MIN_INDEX);
 
     Utils.log("GLFont min char %d", testFont1.getFontMinIndex());
     Utils.log("GLFont_RobotoThin18 min char %d", testFont2.getFontMinIndex());
@@ -63,6 +63,8 @@ public class GLActivity extends Activity implements SensorEventListener
   {
     ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
     ConfigurationInfo info = am.getDeviceConfigurationInfo();
+
+    Utils.log(info.getGlEsVersion());
     return info.reqGlEsVersion >= 0x20000;
   }
 
